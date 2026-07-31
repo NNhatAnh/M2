@@ -1,4 +1,5 @@
 import numpy as np
+import time
 import pandas as pd
 from config import *
 from utils import *
@@ -29,13 +30,16 @@ class OutlierPipeline:
     # =====================================================
     # Z-score Detection
     # =====================================================
-    def zscore_detect(self, signal, threshold=3.0):
-        mean = np.mean(signal)
-        std = np.std(signal)
-        if std == 0:
+    def modified_zscore_detect(self, signal, threshold=3.5):
+        median = np.median(signal)
+        mad = np.median(np.abs(signal - median))
+
+        if mad == 0:
             return np.zeros(len(signal), dtype=bool)
-        z = np.abs((signal - mean) / std)
-        return z > threshold
+
+        modified_z = 0.6745 * (signal - median) / mad
+
+        return np.abs(modified_z) > threshold
 
     # =====================================================
     # IQR Detection
@@ -58,9 +62,9 @@ class OutlierPipeline:
             result = {}
             for feature in FEATURE_COLUMNS:
                 signal = df[feature].values
-                mask_z = self.zscore_detect(signal)
+                mask_mz = self.modified_zscore_detect(signal)
                 mask_iqr = self.iqr_detect(signal)
-                mask = mask_z | mask_iqr
+                mask = mask_mz & mask_iqr
                 result[feature] = mask
                 print(f"{feature:<15}" f" Outlier : {mask.sum()}")
             self.cleaned[name] = {
@@ -80,7 +84,7 @@ class OutlierPipeline:
             removed = {}
             for feature in FEATURE_COLUMNS:
                 signal = df[feature].values.astype(float)
-                outlier_mask = mask[feature]
+                outlier_mask = self.remove_long_gap(mask[feature])
                 signal[outlier_mask] = np.nan
 
                 # Linear interpolation
@@ -101,6 +105,24 @@ class OutlierPipeline:
             print(f"{name} finished.")
         print()
 
+    def remove_long_gap(self, mask, max_gap=5):
+        mask = mask.copy()
+        start = None
+
+        for i in range(len(mask)):
+            if mask[i] and start is None:
+                start = i
+            elif (not mask[i]) and start is not None:
+                if i - start > max_gap:
+                    mask[start:i] = False
+                start = None
+
+        if start is not None:
+            if len(mask)-start > max_gap:
+                mask[start:] = False
+
+        return mask
+
     # =====================================================
     # Evaluation
     # =====================================================
@@ -118,20 +140,29 @@ class OutlierPipeline:
             for feature in FEATURE_COLUMNS:
                 raw = raw_df[feature].values
                 clean = clean_df[feature].values
-                feature_rmse = rmse(raw, clean)
-                feature_mae = mae(raw, clean)
+                removed_ratio = removed[feature] / len(raw) * 100
+                corr = np.corrcoef(raw, clean)[0, 1]
+                energy = (np.sum(clean**2) / np.sum(raw**2)) * 100
+
+                correction = np.mean(
+                    np.abs(raw-clean)
+                )
                 feature_mse = mse(raw, clean)
 
                 report.add(f"{feature} Removed", removed[feature])
-                report.add(f"{feature} RMSE", round(feature_rmse, 6))
-                report.add(f"{feature} MAE", round(feature_mae, 6))
+                report.add(f"{feature} Correlation", round(corr, 6))
+                report.add(f"{feature} Energy", round(energy, 6))
+                report.add(f"{feature} Correction", round(correction, 6))
+                report.add(f"{feature} Removed Ratio", round(removed_ratio, 6))
                 report.blank()
 
                 summary.append({
                     "Feature": feature,
                     "Removed": removed[feature],
-                    "RMSE": feature_rmse,
-                    "MAE": feature_mae,
+                    "Correlation": round(corr, 6),
+                    "Energy": round(energy, 6),
+                    "Correction": round(correction, 6),
+                    "Removed Ratio": round(removed_ratio, 6),
                     "MSE": feature_mse
                 })
             output = create_output_folder("outlier", name)
@@ -203,12 +234,16 @@ class OutlierPipeline:
     # Run Pipeline
     # =====================================================
     def run(self):
-       self.load_dataset()
-       self.detect()
-       self.remove()
-       self.evaluate()
-       self.plot()
-       self.export()
+        start = time.perf_counter()
+        self.load_dataset()
+        self.detect()
+        self.remove()
+        self.evaluate()
+        self.plot()
+        self.export()
+        runtime = time.perf_counter() - start
+        print(f"Outlier Removal Pipeline completed in {runtime:.2f} seconds.\n")
+
 
 if __name__ == "__main__":
     pipeline = OutlierPipeline()
