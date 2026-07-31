@@ -1,0 +1,40 @@
+============================================================
+MOTION OUTLIER REPORT
+============================================================
+
+amp_mean Removed              : 138
+amp_mean Correlation          : 0.889319
+amp_mean Energy               : 101.941649
+amp_mean Correction           : 0.355993
+amp_mean Removed Ratio        : 5.229254
+
+amp_std Removed               : 337
+amp_std Correlation           : 0.64933
+amp_std Energy                : 85.143865
+amp_std Correction            : 0.735163
+amp_std Removed Ratio         : 12.769989
+
+amp_max Removed               : 112
+amp_max Correlation           : 0.921305
+amp_max Energy                : 99.039731
+amp_max Correction            : 0.531406
+amp_max Removed Ratio         : 4.244032
+
+phase_std Removed             : 330
+phase_std Correlation         : 0.405172
+phase_std Energy              : 21.439824
+phase_std Correction          : 0.140617
+phase_std Removed Ratio       : 12.504737
+
+i_mean Removed                : 0
+i_mean Correlation            : 1.0
+i_mean Energy                 : 100.0
+i_mean Correction             : 0.0
+i_mean Removed Ratio          : 0.0
+
+q_mean Removed                : 0
+q_mean Correlation            : 1.0
+q_mean Energy                 : 100.0
+q_mean Correction             : 0.0
+q_mean Removed Ratio          : 0.0
+

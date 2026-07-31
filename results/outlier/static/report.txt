@@ -1,0 +1,40 @@
+============================================================
+STATIC OUTLIER REPORT
+============================================================
+
+amp_mean Removed              : 218
+amp_mean Correlation          : 0.846959
+amp_mean Energy               : 102.641439
+amp_mean Correction           : 0.492873
+amp_mean Removed Ratio        : 8.158683
+
+amp_std Removed               : 476
+amp_std Correlation           : 0.605334
+amp_std Energy                : 83.384593
+amp_std Correction            : 0.944516
+amp_std Removed Ratio         : 17.814371
+
+amp_max Removed               : 307
+amp_max Correlation           : 0.83729
+amp_max Energy                : 98.187758
+amp_max Correction            : 1.240301
+amp_max Removed Ratio         : 11.489521
+
+phase_std Removed             : 310
+phase_std Correlation         : 0.523247
+phase_std Energy              : 33.799989
+phase_std Correction          : 0.131127
+phase_std Removed Ratio       : 11.601796
+
+i_mean Removed                : 0
+i_mean Correlation            : 1.0
+i_mean Energy                 : 100.0
+i_mean Correction             : 0.0
+i_mean Removed Ratio          : 0.0
+
+q_mean Removed                : 0
+q_mean Correlation            : 1.0
+q_mean Energy                 : 100.0
+q_mean Correction             : 0.0
+q_mean Removed Ratio          : 0.0
+
