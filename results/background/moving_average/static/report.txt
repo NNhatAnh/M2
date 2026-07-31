@@ -1,0 +1,50 @@
+============================================================
+Background Estimation (static)
+============================================================
+
+Samples                       : 2672
+Duration(s)                   : 267.1
+
+amp_mean                      : 
+Background STD                : 1.184767
+Motion STD                    : 1.836133
+Background Energy             : 2536262.05
+Motion Energy                 : 9019.69
+Correlation                   : 0.4445
+
+amp_std                       : 
+Background STD                : 0.634611
+Motion STD                    : 1.053947
+Background Energy             : 323527.0
+Motion Energy                 : 2971.65
+Correlation                   : 0.4836
+
+amp_max                       : 
+Background STD                : 2.006106
+Motion STD                    : 3.563099
+Background Energy             : 6664231.69
+Motion Energy                 : 33967.33
+Correlation                   : 0.3981
+
+phase_std                     : 
+Background STD                : 0.155757
+Motion STD                    : 0.196267
+Background Energy             : 209.58
+Motion Energy                 : 102.93
+Correlation                   : 0.6264
+
+i_mean                        : 
+Background STD                : 4.935362
+Motion STD                    : 11.099529
+Background Energy             : 65202.62
+Motion Energy                 : 329210.54
+Correlation                   : 0.449
+
+q_mean                        : 
+Background STD                : 4.704638
+Motion STD                    : 11.196172
+Background Energy             : 59990.08
+Motion Energy                 : 334968.92
+Correlation                   : 0.43
+
+Runtime(s)                    : 0.01
