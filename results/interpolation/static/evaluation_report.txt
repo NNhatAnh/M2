@@ -1,0 +1,20 @@
+============================================================
+STATIC INTERPOLATION
+============================================================
+
+amp_mean RMSE                 : 4.083339
+amp_mean MAE                  : 2.614915
+amp_std RMSE                  : 3.531165
+amp_std MAE                   : 2.026552
+amp_max RMSE                  : 8.500549
+amp_max MAE                   : 5.481729
+phase_std RMSE                : 0.559314
+phase_std MAE                 : 0.241359
+i_mean RMSE                   : 20.316281
+i_mean MAE                    : 15.18762
+q_mean RMSE                   : 20.812088
+q_mean MAE                    : 15.749349
+
+Sampling Frequency            : 9.647
+Packet Jitter                 : 0.175302
+PSI                           : 0
