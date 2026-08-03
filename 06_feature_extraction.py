@@ -39,6 +39,13 @@ METHODS = [
     "moving_average"
 ]
 
+# ==========================================================
+# Sliding Window
+# ==========================================================
+WINDOW_SIZE = 256
+WINDOW_OVERLAP = 0.5
+STEP_SIZE = int(WINDOW_SIZE * (1 - WINDOW_OVERLAP))
+
 
 # ==========================================================
 # Statistical Features
@@ -76,6 +83,19 @@ class FeaturePipeline:
         if not file.exists():
             raise FileNotFoundError(file)
         return pd.read_csv(file)
+
+    # ======================================================
+    # Sliding Window
+    # ======================================================
+    def create_windows(self, df):
+        windows=[]
+        N=len(df)
+        start=0
+
+        while start+WINDOW_SIZE<=N:
+            windows.append(df.iloc[start:start+WINDOW_SIZE].copy())
+            start+=STEP_SIZE
+        return windows
 
     # ==========================================================
     # Temporal Features
@@ -152,7 +172,6 @@ class FeaturePipeline:
     # ==========================================================
     # Frequency Features
     # ==========================================================
-
     def frequency_features(self, signal):
         feature = {}
         signal = np.asarray(signal)
@@ -235,6 +254,9 @@ class FeaturePipeline:
             dataset
         )
 
+        windows = self.create_windows(df)
+        print(f"Total windows: {len(windows)}")
+
         output_folder = (FEATURE_DIR / method / dataset)
         output_folder.mkdir(
             parents=True,
@@ -253,88 +275,96 @@ class FeaturePipeline:
         # ==================================================
         # Feature Extraction
         # ==================================================
-        for feature_name in FEATURE_COLUMNS:
-            print(
-                f"Extract : {feature_name}"
-            )
-            signal = df[feature_name].values
-            stat = statistical_features(
-                signal
-            )
-            temp = self.temporal_features(
-                signal
-            )
-            freq = self.frequency_features(
-                signal
-            )
-            result = {
-                "Method": method,
-                "Dataset": dataset,
-                "Signal": feature_name
-            }
-            result.update(stat)
-            result.update(temp)
-            result.update(freq)
-            feature_table.append(
-                result
-            )
+        feature_vectors = []
+
+        for window_id, window in enumerate(windows):
+            print(f"Window {window_id+1}/{len(windows)}")
             feature_vector = {
+                "Sample": f"{method}_{dataset}_{window_id:03d}",
                 "Method": method,
                 "Dataset": dataset,
                 "Label": 0 if dataset == "static" else 1
             }
+            for feature_name in FEATURE_COLUMNS:
+                print(
+                    f"Extract : {feature_name}"
+                )
+                signal = window[feature_name].values
+                stat = statistical_features(
+                    signal
+                )
+                temp = self.temporal_features(
+                    signal
+                )
+                freq = self.frequency_features(
+                    signal
+                )
+                result = {
+                    "Sample": f"{method}_{dataset}_{window_id:03d}",
+                    "Method": method,
+                    "Dataset": dataset,
+                    "Window": window_id,
+                    "Signal": feature_name
+                }
+                result.update(stat)
+                result.update(temp)
+                result.update(freq)
+                feature_table.append(
+                    result
+                )
 
-            for k,v in stat.items():
-                feature_vector[
-                    f"{feature_name}_{k}"] = v
+                for k, v in stat.items():
+                    feature_vector[
+                        f"{feature_name}_{k}"] = v
 
-            for k,v in temp.items():
-                feature_vector[
-                    f"{feature_name}_{k}"] = v
+                for k, v in temp.items():
+                    feature_vector[
+                        f"{feature_name}_{k}"] = v
 
-            for k,v in freq.items():
-                feature_vector[
-                    f"{feature_name}_{k}"] = v
+                for k, v in freq.items():
+                    feature_vector[
+                        f"{feature_name}_{k}"] = v
 
-            vector_df = pd.DataFrame([feature_vector])
-            vector_df.to_csv(output_folder / "feature_vector.csv", index=False)
+                # ----------------------------
+                # Summary
+                # ----------------------------
+                summary.append({
+                    "Signal": feature_name,
+                    "Mean": stat["Mean"],
+                    "STD": stat["STD"],
+                    "RMS": stat["RMS"],
+                    "CoeffVar": stat["CoeffVar"],
+                    "Energy": temp["Energy"],
+                    "PeakCount": temp["PeakCount"],
+                    "PeakHeight": temp["PeakHeight"],
+                    "PeakProminence": temp["PeakProminence"],
+                    "ActivityRatio": temp["ActivityRatio"],
+                    "SpectralEntropy": freq["SpectralEntropy"],
+                    "SpectralCentroid": freq["SpectralCentroid"],
+                    "Bandwidth": freq["Bandwidth"],
+                    "FFTEnergy": freq["FFTEnergy"]
+                })
 
-            # ----------------------------
-            # Summary
-            # ----------------------------
-            summary.append({
-               "Signal": feature_name,
-               "Mean": stat["Mean"],
-               "STD": stat["STD"],
-               "RMS": stat["RMS"],
-               "CoeffVar": stat["CoeffVar"],
-               "Energy": temp["Energy"],
-               "PeakCount": temp["PeakCount"],
-               "PeakHeight": temp["PeakHeight"],
-               "PeakProminence": temp["PeakProminence"],
-               "ActivityRatio": temp["ActivityRatio"],
-               "SpectralEntropy": freq["SpectralEntropy"],
-               "SpectralCentroid": freq["SpectralCentroid"],
-               "Bandwidth": freq["Bandwidth"],
-               "FFTEnergy": freq["FFTEnergy"]
-            })
+                # ----------------------------
+                # Report
+                # ----------------------------
+                report.add(feature_name, "")
+                for k, v in result.items():
+                    if k in [
+                        "Method",
+                        "Dataset",
+                        "Signal"
+                    ]:
+                        continue
+                    if isinstance(v, float):
+                        report.add(k, round(v, 4))
+                    else:
+                        report.add(k, v)
+                report.blank()
+            feature_vectors.append(feature_vector)
+        vector_df = pd.DataFrame(feature_vectors)
 
-            # ----------------------------
-            # Report
-            # ----------------------------
-            report.add(feature_name, "")
-            for k, v in result.items():
-                if k in [
-                    "Method",
-                    "Dataset",
-                    "Signal"
-                ]:
-                    continue
-                if isinstance(v, float):
-                    report.add(k, round(v, 4))
-                else:
-                    report.add(k, v)
-            report.blank()
+        vector_df.to_csv(output_folder / "feature_vector.csv", index=False)    
         runtime = (
             time.perf_counter() - start
         )
