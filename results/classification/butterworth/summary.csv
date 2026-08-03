@@ -1,0 +1,5 @@
+Method,Model,Runtime(s),Accuracy,Precision,Recall,F1 Score,ROC AUC,Overall Score
+butterworth,logistic,0.0029993057250976562,1.0,1.0,1.0,1.0,1.0,1.0
+butterworth,svm,0.002001047134399414,1.0,1.0,1.0,1.0,1.0,1.0
+butterworth,random_forest,0.2800290584564209,1.0,1.0,1.0,1.0,1.0,1.0
+butterworth,mlp,0.03699851036071777,1.0,1.0,1.0,1.0,1.0,1.0

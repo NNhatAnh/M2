@@ -1,0 +1,9 @@
+Sample,GroundTruth,Prediction,Probability
+butterworth_static_007,0,0,0.09806534349506565
+butterworth_static_014,0,0,0.042816622806927676
+butterworth_motion_009,1,1,0.9743762609837331
+butterworth_motion_011,1,1,0.945128228638498
+butterworth_static_006,0,0,0.028709454354704452
+butterworth_motion_001,1,1,0.765512174137688
+butterworth_static_010,0,0,0.07210026868554129
+butterworth_motion_000,1,1,0.9557787379929468

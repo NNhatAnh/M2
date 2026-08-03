@@ -1,0 +1,5 @@
+Method,Model,Runtime(s),Accuracy,Precision,Recall,F1 Score,ROC AUC,Overall Score
+moving_average,logistic,0.007000923156738281,1.0,1.0,1.0,1.0,1.0,1.0
+moving_average,svm,0.004003286361694336,1.0,1.0,1.0,1.0,1.0,1.0
+moving_average,random_forest,0.26566624641418457,1.0,1.0,1.0,1.0,1.0,1.0
+moving_average,mlp,0.037999629974365234,1.0,1.0,1.0,1.0,1.0,1.0

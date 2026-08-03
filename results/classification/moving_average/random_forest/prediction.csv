@@ -1,0 +1,9 @@
+Sample,GroundTruth,Prediction,Probability
+moving_average_static_007,0,0,0.01
+moving_average_static_014,0,0,0.05
+moving_average_motion_009,1,1,0.9333333333333333
+moving_average_motion_011,1,1,0.95
+moving_average_static_006,0,0,0.02666666666666667
+moving_average_motion_001,1,1,0.8133333333333334
+moving_average_static_010,0,0,0.07333333333333333
+moving_average_motion_000,1,1,0.95
