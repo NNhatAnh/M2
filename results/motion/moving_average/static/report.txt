@@ -1,0 +1,59 @@
+============================================================
+MOVING_AVERAGE - STATIC
+============================================================
+
+amp_mean                      : 
+Threshold                     : 0.37
+Activity Ratio                : 11.2275
+Motion Duration               : 30.0
+Peak Count                    : 17
+Peak Height                   : 0.5391
+Score Mean                    : 0.2033
+Score STD                     : 0.1667
+
+amp_std                       : 
+Threshold                     : 0.2628
+Activity Ratio                : 7.8219
+Motion Duration               : 20.9
+Peak Count                    : 9
+Peak Height                   : 0.6085
+Score Mean                    : 0.1053
+Score STD                     : 0.1575
+
+amp_max                       : 
+Threshold                     : 0.3354
+Activity Ratio                : 13.6976
+Motion Duration               : 36.6
+Peak Count                    : 21
+Peak Height                   : 0.4942
+Score Mean                    : 0.1792
+Score STD                     : 0.1562
+
+phase_std                     : 
+Threshold                     : 0.2431
+Activity Ratio                : 10.1796
+Motion Duration               : 27.2
+Peak Count                    : 10
+Peak Height                   : 0.5763
+Score Mean                    : 0.0835
+Score STD                     : 0.1596
+
+i_mean                        : 
+Threshold                     : 0.3791
+Activity Ratio                : 15.4192
+Motion Duration               : 41.2
+Peak Count                    : 28
+Peak Height                   : 0.5087
+Score Mean                    : 0.213
+Score STD                     : 0.1661
+
+q_mean                        : 
+Threshold                     : 0.5478
+Activity Ratio                : 18.6003
+Motion Duration               : 49.7
+Peak Count                    : 27
+Peak Height                   : 0.7428
+Score Mean                    : 0.3214
+Score STD                     : 0.2265
+
+Runtime(s)                    : 0.006

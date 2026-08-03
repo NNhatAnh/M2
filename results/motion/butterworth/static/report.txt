@@ -1,0 +1,59 @@
+============================================================
+BUTTERWORTH - STATIC
+============================================================
+
+amp_mean                      : 
+Threshold                     : 0.4189
+Activity Ratio                : 14.4087
+Motion Duration               : 38.5
+Peak Count                    : 24
+Peak Height                   : 0.5423
+Score Mean                    : 0.2469
+Score STD                     : 0.1719
+
+amp_std                       : 
+Threshold                     : 0.2679
+Activity Ratio                : 6.8488
+Motion Duration               : 18.3
+Peak Count                    : 8
+Peak Height                   : 0.6438
+Score Mean                    : 0.1111
+Score STD                     : 0.1568
+
+amp_max                       : 
+Threshold                     : 0.3284
+Activity Ratio                : 14.1467
+Motion Duration               : 37.8
+Peak Count                    : 18
+Peak Height                   : 0.4851
+Score Mean                    : 0.1786
+Score STD                     : 0.1499
+
+phase_std                     : 
+Threshold                     : 0.2343
+Activity Ratio                : 9.0569
+Motion Duration               : 24.2
+Peak Count                    : 10
+Peak Height                   : 0.5521
+Score Mean                    : 0.0803
+Score STD                     : 0.154
+
+i_mean                        : 
+Threshold                     : 0.4239
+Activity Ratio                : 15.3443
+Motion Duration               : 41.0
+Peak Count                    : 26
+Peak Height                   : 0.5745
+Score Mean                    : 0.2404
+Score STD                     : 0.1835
+
+q_mean                        : 
+Threshold                     : 0.5976
+Activity Ratio                : 19.1617
+Motion Duration               : 51.2
+Peak Count                    : 29
+Peak Height                   : 0.7785
+Score Mean                    : 0.3522
+Score STD                     : 0.2454
+
+Runtime(s)                    : 0.006
