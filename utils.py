@@ -3,12 +3,31 @@ import numpy as np
 from pathlib import Path
 from config import *
 
+# ==========================================================
+# Configure pandas display so DataFrames print full content in logs and console
+# ==========================================================
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", None)
+pd.set_option("display.max_colwidth", None)
+pd.set_option("display.expand_frame_repr", False)
+pd.set_option("display.show_dimensions", False)
+
 
 # ==========================================================
 # Read CSV
 # ==========================================================
 def read_csv(file_path):
-    df = pd.read_csv(file_path, sep=CSV_SEPARATOR)
+    if isinstance(file_path, (list, tuple)):
+        if not file_path:
+            raise ValueError("No input files were provided.")
+        
+        frames = []
+        for path in file_path:
+            frames.append(pd.read_csv(path, sep=CSV_SEPARATOR))
+        df = pd.concat(frames, ignore_index=True)
+    else:
+        df = pd.read_csv(file_path, sep=CSV_SEPARATOR)
     df = df.sort_values(TIME_COLUMN)
     df = df.reset_index(drop=True)
     return df
