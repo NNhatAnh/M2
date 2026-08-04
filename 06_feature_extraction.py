@@ -30,22 +30,6 @@ from config import *
 from utils import *
 from report import *
 
-# ==========================================================
-# CONFIG
-# ==========================================================
-METHODS = [
-    "butterworth",
-    "median",
-    "moving_average"
-]
-
-# ==========================================================
-# Sliding Window
-# ==========================================================
-WINDOW_SIZE = 256
-WINDOW_OVERLAP = 0.5
-STEP_SIZE = int(WINDOW_SIZE * (1 - WINDOW_OVERLAP))
-
 
 # ==========================================================
 # Statistical Features
@@ -88,13 +72,13 @@ class FeaturePipeline:
     # Sliding Window
     # ======================================================
     def create_windows(self, df):
-        windows=[]
-        N=len(df)
-        start=0
+        windows = []
+        N = len(df)
+        start = 0
 
-        while start+WINDOW_SIZE<=N:
+        while start+WINDOW_SIZE <= N:
             windows.append(df.iloc[start:start+WINDOW_SIZE].copy())
-            start+=STEP_SIZE
+            start += STEP_SIZE
         return windows
 
     # ==========================================================
@@ -364,7 +348,7 @@ class FeaturePipeline:
             feature_vectors.append(feature_vector)
         vector_df = pd.DataFrame(feature_vectors)
 
-        vector_df.to_csv(output_folder / "feature_vector.csv", index=False)    
+        vector_df.to_csv(output_folder / "feature_vector.csv", index=False)
         runtime = (
             time.perf_counter() - start
         )

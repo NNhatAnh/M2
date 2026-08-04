@@ -31,21 +31,6 @@ from metrics import *
 from visualization import *
 from report import *
 
-# ==========================================================
-# CONFIG
-# ==========================================================
-METHODS = [
-    "butterworth",
-    "median",
-    "moving_average"
-]
-
-ROLLING_WINDOW = 25
-GAUSSIAN_SIGMA = 2
-
-# Adaptive Threshold
-THRESHOLD_FACTOR = 1.0
-
 
 # ==========================================================
 # Rolling STD
@@ -112,9 +97,7 @@ class MotionPipeline:
             raise FileNotFoundError(
                 input_file
             )
-        df = pd.read_csv(
-            input_file
-        )
+        df = pd.read_csv(input_file)
         return df
 
     # ======================================================
@@ -203,7 +186,7 @@ class MotionPipeline:
             # ------------------------------------------
             activity_ratio = np.mean(binary) * 100
             motion_duration = np.sum(binary) / TARGET_FS
-            
+
             peaks, properties = find_peaks(
                 score,
                 height=threshold,
@@ -211,7 +194,7 @@ class MotionPipeline:
             )
             peak_count = len(peaks)
 
-            if len(peaks)>0:
+            if len(peaks) > 0:
                 mean_peak_height = np.mean(
                     properties["peak_heights"]
                 )
@@ -411,14 +394,14 @@ class MotionPipeline:
         # Benchmark
         # ==================================================
         self.summary.append({
-           "Method": method,
-           "Dataset": dataset_name,
-           "Runtime(s)": runtime,
-           "Mean Activity Ratio": summary["Activity Ratio"].mean(),
-           "Mean Motion Duration": summary["Motion Duration"].mean(),
-           "Mean Peak Count": summary["Peak Count"].mean(),
-           "Mean Peak Height": summary["Mean Peak Height"].mean(),
-           "Mean Score STD": summary["Score STD"].mean()
+            "Method": method,
+            "Dataset": dataset_name,
+            "Runtime(s)": runtime,
+            "Mean Activity Ratio": summary["Activity Ratio"].mean(),
+            "Mean Motion Duration": summary["Motion Duration"].mean(),
+            "Mean Peak Count": summary["Peak Count"].mean(),
+            "Mean Peak Height": summary["Mean Peak Height"].mean(),
+            "Mean Score STD": summary["Score STD"].mean()
         })
 
         print()
@@ -459,6 +442,7 @@ class MotionPipeline:
         print(f"Benchmark saved :\n{benchmark_file}")
         print("="*60)
         return benchmark
+
 
 if __name__ == "__main__":
     pipeline = MotionPipeline()

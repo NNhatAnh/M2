@@ -43,24 +43,6 @@ from config import *
 from utils import *
 from report import *
 
-# ==========================================================
-# CONFIG
-# ==========================================================
-METHODS = [
-    "butterworth",
-    "median",
-    "moving_average"
-]
-
-MODELS = [
-    "logistic",
-    "svm",
-    "random_forest",
-    "mlp"
-]
-RANDOM_STATE = 42
-TEST_SIZE = 0.2
-
 
 # ==========================================================
 # Classification Pipeline
@@ -104,7 +86,7 @@ class ClassificationPipeline:
     # ======================================================
     # Prepare Data
     # ======================================================
-    def prepare_data(self,dataset):
+    def prepare_data(self, dataset):
         y = dataset["Label"]
         X = dataset.drop(
             columns=[
@@ -686,7 +668,7 @@ class ClassificationPipeline:
         benchmark.insert(
             0,
             "Rank",
-            np.arange(1,len(benchmark)+1)
+            np.arange(1, len(benchmark)+1)
         )
         benchmark.to_csv(
             BENCHMARK_DIR / "classification_benchmark.csv", index=False)
