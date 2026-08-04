@@ -88,6 +88,10 @@ class ClassificationPipeline:
     # ======================================================
     def prepare_data(self, dataset):
         y = dataset["Label"]
+
+        # -----------------------------------------
+        # Remove metadata
+        # -----------------------------------------
         X = dataset.drop(
             columns=[
                 "Sample",
@@ -97,6 +101,26 @@ class ClassificationPipeline:
             ],
             errors="ignore"
         )
+
+        # -----------------------------------------
+        # Keep only selected features
+        # -----------------------------------------
+        selected_columns = []
+        for col in X.columns:
+            for feature in SELECTED_FEATURES:
+                if col.endswith(feature):
+                    selected_columns.append(col)
+                    break
+
+        X = X[selected_columns]
+
+        print()
+        print("="*60)
+        print("FEATURE SELECTION")
+        print("="*60)
+        print(f"Original Features : {len(dataset.columns)-4}")
+        print(f"Selected Features : {len(X.columns)}")
+        print()
 
         X = X.astype(np.float64)
         feature_names = X.columns.tolist()

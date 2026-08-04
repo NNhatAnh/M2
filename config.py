@@ -69,6 +69,25 @@ DATASETS = {
     ]
 }
 
+# ==========================================================
+# FEATURE SELECTION
+# ==========================================================
+SELECTED_FEATURES = [
+    "Median",
+    "STD",
+    "RMS",
+    "IQR",
+    "Skewness",
+    "Kurtosis",
+    "Energy",
+    "PeakCount",
+    "PeakHeight",
+    "ActivityRatio",
+    "FFTEnergy",
+    "SpectralEntropy",
+    "Bandwidth"
+]
+
 # =========================================================
 # METHODS
 # =========================================================

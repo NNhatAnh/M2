@@ -38,15 +38,12 @@ def statistical_features(signal):
     feature = {}
     signal = np.asarray(signal)
 
-    feature["Mean"] = np.mean(signal)
     feature["Median"] = np.median(signal)
     feature["STD"] = np.std(signal)
-    feature["Variance"] = np.var(signal)
     feature["RMS"] = np.sqrt(np.mean(signal**2))
     feature["IQR"] = iqr(signal)
     feature["Skewness"] = skew(signal)
     feature["Kurtosis"] = kurtosis(signal)
-    feature["CoeffVar"] = (np.std(signal) / (np.mean(signal) + 1e-12))
 
     return feature
 
@@ -88,27 +85,7 @@ class FeaturePipeline:
         feature = {}
         signal = np.asarray(signal)
 
-        # --------------------------------------
-        # Signal Energy
-        # --------------------------------------
         feature["Energy"] = np.sum(signal**2)
-
-        # --------------------------------------
-        # Signal Power
-        # --------------------------------------
-        feature["Power"] = np.mean(signal**2)
-
-        # --------------------------------------
-        # Zero Crossing Rate
-        # --------------------------------------
-        center = np.mean(signal)
-
-        feature["ZeroCrossingRate"] = np.sum(
-            np.diff(signal > center)) / len(signal)
-
-        # --------------------------------------
-        # Peak Detection
-        # --------------------------------------
         peaks, properties = find_peaks(
             signal,
             height=np.mean(signal),
@@ -116,40 +93,20 @@ class FeaturePipeline:
         )
         feature["PeakCount"] = len(peaks)
         if len(peaks):
-            feature["PeakHeight"] = np.mean(
-                properties["peak_heights"]
-            )
+            feature["PeakHeight"] = np.mean(properties["peak_heights"])
             prominence = peak_prominences(
                 signal,
                 peaks
             )[0]
-            feature["PeakProminence"] = np.mean(
-                prominence
-            )
-            widths = peak_widths(
-                signal,
-                peaks,
-                rel_height=0.5
-            )[0]
-            feature["PeakWidth"] = np.mean(
-                widths
-            )
+            feature["PeakProminence"] = np.mean(prominence)
         else:
             feature["PeakHeight"] = 0
             feature["PeakProminence"] = 0
-            feature["PeakWidth"] = 0
-
-        # --------------------------------------
-        # Activity Ratio
-        # --------------------------------------
         binary = (
             signal >
             np.mean(signal)
         ).astype(np.uint8)
-        feature["ActivityRatio"] = (
-            np.mean(binary)
-            * 100
-        )
+        feature["ActivityRatio"] = (np.mean(binary) * 100)
         feature["MotionDuration"] = np.sum(binary)
         return feature
 
@@ -166,39 +123,20 @@ class FeaturePipeline:
         spectrum = np.abs(fft(signal))[:N//2]
         freq = np.fft.fftfreq(N, d=1 / TARGET_FS)[:N//2]
 
-        # --------------------------------------
-        # FFT Energy
-        # --------------------------------------
         feature["FFTEnergy"] = np.sum(
             spectrum**2
         )
 
-        # --------------------------------------
-        # Dominant Frequency
-        # --------------------------------------
-        feature["DominantFrequency"] = freq[
-            np.argmax(spectrum)
-        ]
-
-        # --------------------------------------
-        # Spectral Centroid
-        # --------------------------------------
         feature["SpectralCentroid"] = (
             np.sum(freq*spectrum) / (np.sum(spectrum) + 1e-12)
         )
 
-        # --------------------------------------
-        # Spectral Bandwidth
-        # --------------------------------------
         centroid = feature["SpectralCentroid"]
         feature["Bandwidth"] = np.sqrt(
             np.sum(((freq-centroid)**2) * spectrum) /
             (np.sum(spectrum) + 1e-12)
         )
 
-        # --------------------------------------
-        # Spectral Entropy
-        # --------------------------------------
         p = spectrum / (
             np.sum(spectrum)+1e-12
         )
@@ -206,24 +144,6 @@ class FeaturePipeline:
         feature["SpectralEntropy"] = -np.sum(
             p*np.log2(p+1e-12)
         )
-
-        # --------------------------------------
-        # Spectral Flatness
-        # --------------------------------------
-        feature["SpectralFlatness"] = (
-            np.exp(np.mean(np.log(spectrum+1e-12))) /
-            (np.mean(spectrum) + 1e-12)
-        )
-
-        # --------------------------------------
-        # Band Power
-        # --------------------------------------
-        cutoff = np.max(freq) * 0.25
-        low = spectrum[freq < cutoff]
-        high = spectrum[freq >= cutoff]
-
-        feature["LowBandPower"] = np.sum(low**2)
-        feature["HighBandPower"] = np.sum(high**2)
 
         return feature
 
@@ -314,10 +234,8 @@ class FeaturePipeline:
                 # ----------------------------
                 summary.append({
                     "Signal": feature_name,
-                    "Mean": stat["Mean"],
                     "STD": stat["STD"],
                     "RMS": stat["RMS"],
-                    "CoeffVar": stat["CoeffVar"],
                     "Energy": temp["Energy"],
                     "PeakCount": temp["PeakCount"],
                     "PeakHeight": temp["PeakHeight"],
@@ -464,7 +382,6 @@ class FeaturePipeline:
             "Mean Peak Height": feature_df["PeakHeight"].mean(),
             "Mean Peak Prominence": feature_df["PeakProminence"].mean(),
             "Mean Activity": feature_df["ActivityRatio"].mean(),
-            "Mean DominantFreq": feature_df["DominantFrequency"].mean(),
             "Mean Bandwidth": feature_df["Bandwidth"].mean()
         }
 
