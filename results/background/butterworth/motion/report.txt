@@ -2,49 +2,49 @@
 Background Estimation (motion)
 ============================================================
 
-Samples                       : 2639
-Duration(s)                   : 263.8
+Samples                       : 2799
+Duration(s)                   : 279.8
 
 amp_mean                      : 
-Background STD                : 0.844451
-Motion STD                    : 2.592868
-Background Energy             : 2477292.25
-Motion Energy                 : 17741.91
-Correlation                   : 0.3778
+Background STD                : 0.971693
+Motion STD                    : 2.055565
+Background Energy             : 2748473.49
+Motion Energy                 : 11826.81
+Correlation                   : 0.4704
 
 amp_std                       : 
-Background STD                : 0.449138
-Motion STD                    : 1.287312
-Background Energy             : 310441.06
-Motion Energy                 : 4373.28
-Correlation                   : 0.3916
+Background STD                : 0.496512
+Motion STD                    : 1.230659
+Background Energy             : 366459.46
+Motion Energy                 : 4240.33
+Correlation                   : 0.4125
 
 amp_max                       : 
-Background STD                : 1.586543
-Motion STD                    : 5.378263
-Background Energy             : 6520945.94
-Motion Energy                 : 76335.14
-Correlation                   : 0.3597
+Background STD                : 1.678958
+Motion STD                    : 4.580411
+Background Energy             : 7236011.58
+Motion Energy                 : 58728.39
+Correlation                   : 0.3855
 
 phase_std                     : 
-Background STD                : 0.08431
-Motion STD                    : 0.179919
-Background Energy             : 95.75
-Motion Energy                 : 85.43
-Correlation                   : 0.4654
+Background STD                : 0.080287
+Motion STD                    : 0.107964
+Background Energy             : 188.87
+Motion Energy                 : 32.64
+Correlation                   : 0.6261
 
 i_mean                        : 
-Background STD                : 5.079104
-Motion STD                    : 14.899912
-Background Energy             : 70287.56
-Motion Energy                 : 585933.97
-Correlation                   : 0.3699
+Background STD                : 3.80644
+Motion STD                    : 11.662625
+Background Energy             : 40786.87
+Motion Energy                 : 380720.67
+Correlation                   : 0.3676
 
 q_mean                        : 
-Background STD                : 4.84077
-Motion STD                    : 14.623145
-Background Energy             : 63254.57
-Motion Energy                 : 564361.55
-Correlation                   : 0.3624
+Background STD                : 3.542874
+Motion STD                    : 11.937442
+Background Energy             : 35635.42
+Motion Energy                 : 398954.24
+Correlation                   : 0.316
 
-Runtime(s)                    : 0.0069
+Runtime(s)                    : 0.006

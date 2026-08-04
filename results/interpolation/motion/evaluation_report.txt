@@ -2,19 +2,19 @@
 MOTION INTERPOLATION
 ============================================================
 
-amp_mean RMSE                 : 4.138301
-amp_mean MAE                  : 2.769447
-amp_std RMSE                  : 3.507948
-amp_std MAE                   : 2.047136
-amp_max RMSE                  : 8.493162
-amp_max MAE                   : 5.692607
-phase_std RMSE                : 0.613028
-phase_std MAE                 : 0.266072
-i_mean RMSE                   : 20.321611
-i_mean MAE                    : 15.268665
-q_mean RMSE                   : 19.954934
-q_mean MAE                    : 15.051491
+amp_mean RMSE                 : 4.557762
+amp_mean MAE                  : 3.160552
+amp_std RMSE                  : 3.453683
+amp_std MAE                   : 2.185929
+amp_max RMSE                  : 8.99033
+amp_max MAE                   : 6.265715
+phase_std RMSE                : 0.667223
+phase_std MAE                 : 0.345325
+i_mean RMSE                   : 23.104478
+i_mean MAE                    : 18.073126
+q_mean RMSE                   : 22.919848
+q_mean MAE                    : 17.951597
 
-Sampling Frequency            : 8.792
-Packet Jitter                 : 0.183798
+Sampling Frequency            : 34.887
+Packet Jitter                 : 0.053231
 PSI                           : 0
