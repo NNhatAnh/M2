@@ -53,8 +53,20 @@ for folder in ALL_DIRS:
 # DATASET
 # =========================================================
 DATASETS = {
-    "static": RAW_DATA_DIR / "csi_log.csv",
-    "motion": RAW_DATA_DIR / "csi_log1.csv"
+    "static": [
+        RAW_DATA_DIR / "csi_log.csv",
+        RAW_DATA_DIR / "csi_log (1).csv",
+        RAW_DATA_DIR / "csi_log (2).csv",
+        RAW_DATA_DIR / "csi_log (3).csv",
+        RAW_DATA_DIR / "csi_log (4).csv"
+    ],
+    "motion": [
+        RAW_DATA_DIR / "csi_log1.csv",
+        RAW_DATA_DIR / "csi_log1 (1).csv",
+        RAW_DATA_DIR / "csi_log1 (2).csv",
+        RAW_DATA_DIR / "csi_log1 (3).csv",
+        RAW_DATA_DIR / "csi_log1 (4).csv"
+    ]
 }
 
 # =========================================================
@@ -76,6 +88,30 @@ FEATURE_COLUMNS = [
     "i_mean",
     "q_mean"
 ]
+
+# ==========================================================
+# Sliding Window
+# ==========================================================
+WINDOW_SIZE = 256
+WINDOW_OVERLAP = 0.5
+STEP_SIZE = int(WINDOW_SIZE * (1 - WINDOW_OVERLAP))
+
+# ==========================================================
+# MODELS
+# ==========================================================
+MODELS = [
+    "logistic",
+    "svm",
+    "random_forest",
+    "mlp"
+]
+RANDOM_STATE = 42
+TEST_SIZE = 0.2
+
+ROLLING_WINDOW = 25
+GAUSSIAN_SIGMA = 2
+
+THRESHOLD_FACTOR = 1.0
 
 # =========================================================
 # RESAMPLING
