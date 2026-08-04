@@ -47,4 +47,4 @@ Background Energy             : 35635.42
 Motion Energy                 : 398954.24
 Correlation                   : 0.316
 
-Runtime(s)                    : 0.006
+Runtime(s)                    : 0.0058

@@ -3422,4 +3422,4 @@ SpectralFlatness              : 0.2214
 LowBandPower                  : 998.2276
 HighBandPower                 : 3.5133
 
-Runtime(s)                    : 0.1262
+Runtime(s)                    : 0.1308

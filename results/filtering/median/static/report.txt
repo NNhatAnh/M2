@@ -7,7 +7,7 @@ amp_mean STD Reduction (%)    : 31.97
 amp_mean Correlation          : 0.650086
 amp_mean Energy Preservation (%): 101.06
 amp_mean Smoothness Gain (%)  : 67.546
-amp_mean Runtime (ms)         : 0.0001
+amp_mean Runtime (ms)         : 0.0002
 
 amp_std Variance Reduction (%): 63.903
 amp_std STD Reduction (%)     : 39.92
@@ -35,7 +35,7 @@ i_mean STD Reduction (%)      : 27.503
 i_mean Correlation            : 0.559218
 i_mean Energy Preservation (%): 52.578
 i_mean Smoothness Gain (%)    : 63.655
-i_mean Runtime (ms)           : 0.0001
+i_mean Runtime (ms)           : 0.0
 
 q_mean Variance Reduction (%) : 46.19
 q_mean STD Reduction (%)      : 26.644

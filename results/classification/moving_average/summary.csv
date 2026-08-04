@@ -1,5 +1,5 @@
 Method,Model,Runtime(s),Accuracy,Precision,Recall,F1 Score,ROC AUC,Overall Score
-moving_average,logistic,0.0039997100830078125,1.0,1.0,1.0,1.0,1.0,1.0
-moving_average,svm,0.0010023117065429688,1.0,1.0,1.0,1.0,1.0,1.0
-moving_average,random_forest,0.2657904624938965,1.0,1.0,1.0,1.0,1.0,1.0
-moving_average,mlp,0.03699779510498047,1.0,1.0,1.0,1.0,1.0,1.0
+moving_average,logistic,0.003998756408691406,1.0,1.0,1.0,1.0,1.0,1.0
+moving_average,svm,0.002000570297241211,1.0,1.0,1.0,1.0,1.0,1.0
+moving_average,random_forest,0.3230295181274414,1.0,1.0,1.0,1.0,1.0,1.0
+moving_average,mlp,0.042000770568847656,1.0,1.0,1.0,1.0,1.0,1.0
