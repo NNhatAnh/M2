@@ -20,7 +20,6 @@ FEATURE_DATA_DIR = DATA_DIR / "features"
 # RESULT PATH
 # =========================================================
 RESULT_DIR = ROOT_DIR / "results"
-
 INTERP_DIR = RESULT_DIR / "interpolation"
 OUTLIER_DIR = RESULT_DIR / "outlier"
 FILTER_DIR = RESULT_DIR / "filtering"
@@ -58,14 +57,38 @@ DATASETS = {
         RAW_DATA_DIR / "csi_log (1).csv",
         RAW_DATA_DIR / "csi_log (2).csv",
         RAW_DATA_DIR / "csi_log (3).csv",
-        RAW_DATA_DIR / "csi_log (4).csv"
+        RAW_DATA_DIR / "csi_log (4).csv",
+        RAW_DATA_DIR / "csi_log (5).csv",
+        RAW_DATA_DIR / "csi_log (6).csv",
+        RAW_DATA_DIR / "csi_log (7).csv",
+        RAW_DATA_DIR / "csi_log (8).csv",
+        RAW_DATA_DIR / "csi_log (9).csv",
+        RAW_DATA_DIR / "csi_log (10).csv",
+        RAW_DATA_DIR / "csi_log (11).csv",
+        RAW_DATA_DIR / "csi_log (12).csv",
+        RAW_DATA_DIR / "csi_log (13).csv",
+        RAW_DATA_DIR / "csi_log (14).csv",
+        RAW_DATA_DIR / "csi_log (15).csv",
+        RAW_DATA_DIR / "csi_log (16).csv",
+        RAW_DATA_DIR / "csi_log (17).csv",
+        RAW_DATA_DIR / "csi_log (18).csv"
     ],
     "motion": [
         RAW_DATA_DIR / "csi_log1.csv",
         RAW_DATA_DIR / "csi_log1 (1).csv",
         RAW_DATA_DIR / "csi_log1 (2).csv",
         RAW_DATA_DIR / "csi_log1 (3).csv",
-        RAW_DATA_DIR / "csi_log1 (4).csv"
+        RAW_DATA_DIR / "csi_log1 (4).csv",
+        RAW_DATA_DIR / "csi_log1 (5).csv",
+        RAW_DATA_DIR / "csi_log1 (6).csv",
+        RAW_DATA_DIR / "csi_log1 (7).csv",
+        RAW_DATA_DIR / "csi_log1 (8).csv",
+        RAW_DATA_DIR / "csi_log1 (9).csv",
+        RAW_DATA_DIR / "csi_log1 (10).csv",
+        RAW_DATA_DIR / "csi_log1 (11).csv",
+        RAW_DATA_DIR / "csi_log1 (12).csv",
+        RAW_DATA_DIR / "csi_log1 (13).csv",
+        RAW_DATA_DIR / "csi_log1 (14).csv"
     ]
 }
 
