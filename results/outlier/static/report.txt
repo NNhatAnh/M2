@@ -2,39 +2,39 @@
 STATIC OUTLIER REPORT
 ============================================================
 
-amp_mean Removed              : 141
-amp_mean Correlation          : 0.773038
-amp_mean Energy               : 103.351158
-amp_mean Correction           : 0.640184
-amp_mean Removed Ratio        : 6.925344
+amp_mean Removed              : 425
+amp_mean Correlation          : 0.123191
+amp_mean Energy               : 56.186016
+amp_mean Correction           : 5.148967
+amp_mean Removed Ratio        : 12.283237
 
-amp_std Removed               : 125
-amp_std Correlation           : 0.742941
-amp_std Energy                : 94.183924
-amp_std Correction            : 0.358447
-amp_std Removed Ratio         : 6.139489
+amp_std Removed               : 303
+amp_std Correlation           : 0.082178
+amp_std Energy                : 19.165536
+amp_std Correction            : 2.164039
+amp_std Removed Ratio         : 8.757225
 
-amp_max Removed               : 50
-amp_max Correlation           : 0.90593
-amp_max Energy                : 101.090059
-amp_max Correction            : 0.400815
-amp_max Removed Ratio         : 2.455796
+amp_max Removed               : 442
+amp_max Correlation           : 0.144661
+amp_max Energy                : 51.242397
+amp_max Correction            : 9.679662
+amp_max Removed Ratio         : 12.774566
 
-phase_std Removed             : 160
-phase_std Correlation         : 0.661165
-phase_std Energy              : 50.454275
-phase_std Correction          : 0.12234
-phase_std Removed Ratio       : 7.858546
+phase_std Removed             : 293
+phase_std Correlation         : 0.047405
+phase_std Energy              : 0.618237
+phase_std Correction          : 0.606269
+phase_std Removed Ratio       : 8.468208
 
-i_mean Removed                : 0
-i_mean Correlation            : 1.0
-i_mean Energy                 : 100.0
-i_mean Correction             : 0.0
-i_mean Removed Ratio          : 0.0
+i_mean Removed                : 10
+i_mean Correlation            : 0.7668
+i_mean Energy                 : 60.251199
+i_mean Correction             : 0.748036
+i_mean Removed Ratio          : 0.289017
 
-q_mean Removed                : 0
-q_mean Correlation            : 1.0
-q_mean Energy                 : 100.0
-q_mean Correction             : 0.0
-q_mean Removed Ratio          : 0.0
+q_mean Removed                : 11
+q_mean Correlation            : 0.512524
+q_mean Energy                 : 26.797031
+q_mean Correction             : 1.407365
+q_mean Removed Ratio          : 0.317919
 

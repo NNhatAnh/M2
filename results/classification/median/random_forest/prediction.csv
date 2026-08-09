@@ -1,9 +1,0 @@
-Sample,GroundTruth,Prediction,Probability
-median_static_007,0,0,0.023333333333333334
-median_static_014,0,0,0.05
-median_motion_009,1,1,0.9433333333333334
-median_motion_011,1,1,0.94
-median_static_006,0,0,0.05
-median_motion_001,1,1,0.68
-median_static_010,0,0,0.19333333333333333
-median_motion_000,1,1,0.9033333333333333

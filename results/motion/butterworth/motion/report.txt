@@ -3,57 +3,57 @@ BUTTERWORTH - MOTION
 ============================================================
 
 amp_mean                      : 
-Threshold                     : 0.3981
-Activity Ratio                : 14.8267
-Motion Duration               : 41.5
-Peak Count                    : 22
-Peak Height                   : 0.5428
-Score Mean                    : 0.2271
-Score STD                     : 0.171
+Threshold                     : 0.405
+Activity Ratio                : 17.1465
+Motion Duration               : 135.2
+Peak Count                    : 52
+Peak Height                   : 0.6325
+Score Mean                    : 0.1863
+Score STD                     : 0.2187
 
 amp_std                       : 
-Threshold                     : 0.1958
-Activity Ratio                : 8.0029
-Motion Duration               : 22.4
-Peak Count                    : 14
-Peak Height                   : 0.2895
-Score Mean                    : 0.0935
-Score STD                     : 0.1023
+Threshold                     : 0.4305
+Activity Ratio                : 17.2987
+Motion Duration               : 136.4
+Peak Count                    : 52
+Peak Height                   : 0.6702
+Score Mean                    : 0.1938
+Score STD                     : 0.2367
 
 amp_max                       : 
-Threshold                     : 0.4033
-Activity Ratio                : 14.7195
-Motion Duration               : 41.2
-Peak Count                    : 20
-Peak Height                   : 0.5598
-Score Mean                    : 0.2288
-Score STD                     : 0.1745
+Threshold                     : 0.4196
+Activity Ratio                : 16.8548
+Motion Duration               : 132.9
+Peak Count                    : 58
+Peak Height                   : 0.5578
+Score Mean                    : 0.2307
+Score STD                     : 0.1889
 
 phase_std                     : 
-Threshold                     : 0.4367
-Activity Ratio                : 14.5052
-Motion Duration               : 40.6
-Peak Count                    : 16
-Peak Height                   : 0.6054
-Score Mean                    : 0.2464
-Score STD                     : 0.1903
+Threshold                     : 0.2903
+Activity Ratio                : 11.858
+Motion Duration               : 93.5
+Peak Count                    : 35
+Peak Height                   : 0.6126
+Score Mean                    : 0.1103
+Score STD                     : 0.18
 
 i_mean                        : 
-Threshold                     : 0.5274
-Activity Ratio                : 16.1129
-Motion Duration               : 45.1
-Peak Count                    : 26
-Peak Height                   : 0.718
-Score Mean                    : 0.3088
-Score STD                     : 0.2185
+Threshold                     : 0.1687
+Activity Ratio                : 6.3792
+Motion Duration               : 50.3
+Peak Count                    : 20
+Peak Height                   : 0.4648
+Score Mean                    : 0.0483
+Score STD                     : 0.1203
 
 q_mean                        : 
-Threshold                     : 0.45
-Activity Ratio                : 16.4702
-Motion Duration               : 46.1
-Peak Count                    : 27
-Peak Height                   : 0.5935
-Score Mean                    : 0.2644
-Score STD                     : 0.1857
+Threshold                     : 0.1372
+Activity Ratio                : 6.8358
+Motion Duration               : 53.9
+Peak Count                    : 19
+Peak Height                   : 0.3883
+Score Mean                    : 0.0398
+Score STD                     : 0.0973
 
-Runtime(s)                    : 0.0043
+Runtime(s)                    : 0.0114

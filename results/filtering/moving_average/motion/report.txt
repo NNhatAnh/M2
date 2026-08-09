@@ -2,45 +2,45 @@
 MOVING_AVERAGE - MOTION
 ============================================================
 
-amp_mean Variance Reduction (%): 67.695
-amp_mean STD Reduction (%)    : 43.162
-amp_mean Correlation          : 0.575951
-amp_mean Energy Preservation (%): 99.174
-amp_mean Smoothness Gain (%)  : 77.861
-amp_mean Runtime (ms)         : 0.0003
+amp_mean Variance Reduction (%): 61.289
+amp_mean STD Reduction (%)    : 37.782
+amp_mean Correlation          : 0.701697
+amp_mean Energy Preservation (%): 57.965
+amp_mean Smoothness Gain (%)  : 74.068
+amp_mean Runtime (ms)         : 0.0004
 
-amp_std Variance Reduction (%): 64.654
-amp_std STD Reduction (%)     : 40.548
-amp_std Correlation           : 0.633928
-amp_std Energy Preservation (%): 98.356
-amp_std Smoothness Gain (%)   : 76.671
-amp_std Runtime (ms)          : 0.0001
+amp_std Variance Reduction (%): 64.499
+amp_std STD Reduction (%)     : 40.417
+amp_std Correlation           : 0.667701
+amp_std Energy Preservation (%): 41.353
+amp_std Smoothness Gain (%)   : 75.353
+amp_std Runtime (ms)          : 0.0002
 
-amp_max Variance Reduction (%): 69.958
-amp_max STD Reduction (%)     : 45.19
-amp_max Correlation           : 0.56948
-amp_max Energy Preservation (%): 98.6
-amp_max Smoothness Gain (%)   : 77.364
-amp_max Runtime (ms)          : 0.0001
+amp_max Variance Reduction (%): 63.766
+amp_max STD Reduction (%)     : 39.805
+amp_max Correlation           : 0.681006
+amp_max Energy Preservation (%): 50.46
+amp_max Smoothness Gain (%)   : 74.56
+amp_max Runtime (ms)          : 0.0002
 
-phase_std Variance Reduction (%): 56.53
-phase_std STD Reduction (%)   : 34.068
-phase_std Correlation         : 0.699751
-phase_std Energy Preservation (%): 81.157
-phase_std Smoothness Gain (%) : 77.802
+phase_std Variance Reduction (%): 61.424
+phase_std STD Reduction (%)   : 37.89
+phase_std Correlation         : 0.69717
+phase_std Energy Preservation (%): 44.575
+phase_std Smoothness Gain (%) : 74.053
 phase_std Runtime (ms)        : 0.0001
 
-i_mean Variance Reduction (%) : 71.144
-i_mean STD Reduction (%)      : 46.282
-i_mean Correlation            : 0.567383
-i_mean Energy Preservation (%): 28.883
-i_mean Smoothness Gain (%)    : 78.086
+i_mean Variance Reduction (%) : 59.295
+i_mean STD Reduction (%)      : 36.199
+i_mean Correlation            : 0.729303
+i_mean Energy Preservation (%): 40.751
+i_mean Smoothness Gain (%)    : 72.666
 i_mean Runtime (ms)           : 0.0001
 
-q_mean Variance Reduction (%) : 73.173
-q_mean STD Reduction (%)      : 48.205
-q_mean Correlation            : 0.555561
-q_mean Energy Preservation (%): 26.839
-q_mean Smoothness Gain (%)    : 77.969
-q_mean Runtime (ms)           : 0.0001
+q_mean Variance Reduction (%) : 61.802
+q_mean STD Reduction (%)      : 38.196
+q_mean Correlation            : 0.703428
+q_mean Energy Preservation (%): 38.291
+q_mean Smoothness Gain (%)    : 73.987
+q_mean Runtime (ms)           : 0.0002
 
