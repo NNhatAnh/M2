@@ -143,23 +143,14 @@ class MotionPipeline:
             print(f"Processing : {feature}")
             motion = df[feature].values
 
-            # ------------------------------------------
-            # Rolling STD
-            # ------------------------------------------
             score = rolling_std(
                 motion
             )
 
-            # ------------------------------------------
-            # Gaussian Smooth
-            # ------------------------------------------
             score = smooth(
                 score
             )
 
-            # ------------------------------------------
-            # Normalize
-            # ------------------------------------------
             score = np.maximum(
                 score - np.percentile(score, 10),
                 0
@@ -168,22 +159,13 @@ class MotionPipeline:
                 score
             )
 
-            # ------------------------------------------
-            # Binary Detection
-            # ------------------------------------------
             binary, threshold = binary_detection(
                 score
             )
 
-            # ------------------------------------------
-            # Save
-            # ------------------------------------------
             score_df[feature] = score
             binary_df[feature] = binary
 
-            # ------------------------------------------
-            # Metrics
-            # ------------------------------------------
             activity_ratio = np.mean(binary) * 100
             motion_duration = np.sum(binary) / TARGET_FS
 

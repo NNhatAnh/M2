@@ -56,9 +56,9 @@ class BackgroundPipeline:
     # ======================================================
     # Load Dataset
     # ======================================================
-    def load_dataset(self, dataset_name):
+    def load_dataset(self, method, dataset_name):
         input_file = (
-            FILTER_DIR / "butterworth" / dataset_name / "filtered.csv"
+            FILTER_DIR / method / dataset_name / "filtered.csv" 
         )
         if not input_file.exists():
             raise FileNotFoundError(
@@ -70,15 +70,11 @@ class BackgroundPipeline:
     # ======================================================
     # Process
     # ======================================================
-    def process(self, dataset_name):
+    def process(self, method, dataset_name):
         print_title(f"BACKGROUND ESTIMATION : {dataset_name.upper()}")
-        df = self.load_dataset(dataset_name)
+        df = self.  load_dataset(method, dataset_name)
 
-        output_folder = (
-            BACKGROUND_DIR
-            / "butterworth"
-            / dataset_name
-        )
+        output_folder = (BACKGROUND_DIR / method / dataset_name)
 
         output_folder.mkdir(
             parents=True,
@@ -240,8 +236,10 @@ class BackgroundPipeline:
         print_title(
             "MODULE 04 : BACKGROUND ESTIMATION"
         )
-        for dataset_name in DATASETS.keys():
-            self.process(dataset_name)
+
+        for method in METHODS:
+            for dataset_name in DATASETS.keys():
+                self.process(method, dataset_name)
 
         # ==============================================
         # Save Benchmark

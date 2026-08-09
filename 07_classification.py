@@ -19,11 +19,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import LeaveOneOut
-from sklearn.model_selection import StratifiedKFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -87,11 +83,11 @@ class ClassificationPipeline:
     # Prepare Data
     # ======================================================
     def prepare_data(self, dataset):
-        y = dataset["Label"]
+        y = dataset["Label"].astype(int)
 
-        # -----------------------------------------
+        # ======================================================
         # Remove metadata
-        # -----------------------------------------
+        # ======================================================
         X = dataset.drop(
             columns=[
                 "Sample",
@@ -102,31 +98,127 @@ class ClassificationPipeline:
             errors="ignore"
         )
 
-        # -----------------------------------------
-        # Keep only selected features
-        # -----------------------------------------
+        # ======================================================
+        # Selected features
+        # ======================================================
         selected_columns = []
+
         for col in X.columns:
+
             for feature in SELECTED_FEATURES:
+
                 if col.endswith(feature):
                     selected_columns.append(col)
                     break
 
         X = X[selected_columns]
 
+        X = X.astype(np.float64)
+
+        feature_names = X.columns.tolist()
+
         print()
-        print("="*60)
+        print("=" * 60)
         print("FEATURE SELECTION")
-        print("="*60)
-        print(f"Original Features : {len(dataset.columns)-4}")
-        print(f"Selected Features : {len(X.columns)}")
+        print("=" * 60)
+        print(
+            f"Original Features : {len(dataset.columns) - 4}"
+        )
+        print(
+            f"Selected Features : {len(feature_names)}"
+        )
         print()
 
-        X = X.astype(np.float64)
-        feature_names = X.columns.tolist()
-        scaler = StandardScaler()
-        X = scaler.fit_transform(X)
-        return (X, y, feature_names, scaler)
+        return X, y, feature_names
+
+    def blocked_split(self, dataset):
+        test_indices = []
+        train_indices = []
+
+        purge = max(
+            1,
+            int(
+                np.ceil(
+                    WINDOW_OVERLAP / (1 - WINDOW_OVERLAP)
+                )
+            )
+        )
+
+        print()
+        print("=" * 60)
+        print("BLOCKED TEMPORAL SPLIT")
+        print("=" * 60)
+        print(
+            f"Test size : {TEST_SIZE * 100:.1f}%"
+        )
+        print(
+            f"Purge windows : {purge}"
+        )
+        print()
+
+        # ======================================================
+        # Split separately for STATIC and MOTION
+        # ======================================================
+        for label in sorted(dataset["Label"].unique()):
+
+            class_indices = np.where(
+                dataset["Label"].values == label
+            )[0]
+
+            n = len(class_indices)
+
+            if n < 5:
+                raise ValueError(
+                    f"Not enough samples for label {label}: {n}"
+                )
+
+            # --------------------------------------------------
+            # Test block = last TEST_SIZE portion
+            # --------------------------------------------------
+            n_test = max(
+                1,
+                int(np.ceil(n * TEST_SIZE))
+            )
+
+            test_start = n - n_test
+
+            # --------------------------------------------------
+            # Purge samples immediately before test
+            # --------------------------------------------------
+            train_end = max(
+                0,
+                test_start - purge
+            )
+
+            train_class = class_indices[:train_end]
+            test_class = class_indices[test_start:]
+
+            train_indices.extend(
+                train_class.tolist()
+            )
+
+            test_indices.extend(
+                test_class.tolist()
+            )
+
+            print(
+                f"Label {label}: "
+                f"Train={len(train_class)}, "
+                f"Test={len(test_class)}, "
+                f"Purged={test_start - train_end}"
+            )
+
+        train_indices = np.array(
+            train_indices,
+            dtype=int
+        )
+
+        test_indices = np.array(
+            test_indices,
+            dtype=int
+        )
+
+        return train_indices, test_indices
 
     # ======================================================
     # Dataset Information
@@ -142,52 +234,6 @@ class ClassificationPipeline:
         print(dataset["Label"].value_counts())
         print()
         print(dataset.describe())
-
-    # ======================================================
-    # Cross Validation
-    # ======================================================
-    def create_cv(self, X, y):
-        n_sample = len(y)
-        print()
-        print("="*60)
-        print(f"Total Samples : {n_sample}")
-        print("="*60)
-
-        # --------------------------------------------
-        # Very Small Dataset
-        # --------------------------------------------
-        if n_sample < 10:
-            print("Validation : Leave-One-Out")
-            cv = LeaveOneOut()
-
-        # --------------------------------------------
-        # Small Dataset
-        # --------------------------------------------
-        elif n_sample < 20:
-            print("Validation : Stratified KFold (5)")
-            cv = StratifiedKFold(
-                n_splits=5,
-                shuffle=True,
-                random_state=RANDOM_STATE
-            )
-
-        # --------------------------------------------
-        # Normal Dataset
-        # --------------------------------------------
-        else:
-            print("Validation : Train/Test Split")
-            cv = None
-        return cv
-
-    # ======================================================
-    # Split Dataset
-    # ======================================================
-    def split_dataset(self, X, y):
-        if len(y) >= 20:
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=TEST_SIZE, stratify=y, random_state=RANDOM_STATE)
-            return (X_train, X_test, y_train, y_test)
-        return None
 
     # ======================================================
     # Create Model
@@ -281,123 +327,88 @@ class ClassificationPipeline:
     # ======================================================
     # Train One Model
     # ======================================================
-    def train_one_model(self, model_name, model, data):
-        self.print_model_information(
-            model_name,
-            model
-        )
-
-        X = data["X"]
-        y = data["y"]
-        feature_names = data["feature_names"]
-        out_dir = data["out_dir"]
-        folder = self.create_output_folder(
-            out_dir,
-            model_name
-        )
-        cv = data["cv"]
-        split = data["split"]
-        sample_name = data["dataset"]["Sample"].values
-        print("Training...")
-        start = time.time()
-
-        # ==============================================
-        # Train/Test
-        # ==============================================
-        if split is not None:
-            X_train, X_test, y_train, y_test = split
-            model.fit(
-                X_train,
-                y_train
-            )
-            y_pred = model.predict(
-                X_test
-            )
-            if hasattr(
-                model,
-                "predict_proba"
-            ):
-                y_score = model.predict_proba(
-                    X_test
-                )[:, 1]
+    def train_one_model(self, model_name, data):
+            X = data["X"]
+            y = data["y"]
+    
+            train_idx = data["train_idx"]
+            test_idx = data["test_idx"]
+    
+            dataset = data["dataset"]
+            out_dir = data["out_dir"]
+    
+            # ======================================================
+            # Create output folder
+            # ======================================================
+            folder = (out_dir/ model_name)
+            folder.mkdir(parents=True,exist_ok=True)
+    
+            # ======================================================
+            # Raw train/test
+            # ======================================================
+            X_train = X.iloc[train_idx]
+            X_test = X.iloc[test_idx]
+    
+            y_train = y.iloc[train_idx]
+            y_test = y.iloc[test_idx]
+    
+            # ======================================================
+            # SCALER
+            # ======================================================
+            scaler = StandardScaler()
+    
+            # Fit ONLY on training data
+            X_train = scaler.fit_transform(X_train)
+    
+            # Transform test using training scaler
+            X_test = scaler.transform(X_test)
+    
+            # ======================================================
+            # Model
+            # ======================================================
+            model = self.create_model(model_name)
+            start = time.perf_counter()
+            model.fit(X_train,y_train)
+            y_pred = model.predict(X_test)
+            runtime = (time.perf_counter()- start)
+    
+            # ======================================================
+            # Probability
+            # ======================================================
+            if hasattr(model, "predict_proba"):
+                y_score = model.predict_proba(X_test)[:, 1]
             else:
                 y_score = None
-            sample_test = sample_name[
-                y_test.index
-            ]
-
-        # ==============================================
-        # Cross Validation
-        # ==============================================
-        else:
-            y_true = []
-            y_pred = []
-            y_score = []
-
-            sample_test = []
-            for train_idx, test_idx in cv.split(X, y):
-                X_train = X[train_idx]
-                X_test = X[test_idx]
-                y_train = y.iloc[train_idx]
-                y_test = y.iloc[test_idx]
-
-                model.fit(
-                    X_train,
-                    y_train
-                )
-                pred = model.predict(
-                    X_test
-                )
-                y_true.extend(
-                    y_test.tolist()
-                )
-                y_pred.extend(
-                    pred.tolist()
-                )
-                sample_test.extend(
-                    sample_name[test_idx]
-                )
-                if hasattr(model, "predict_proba"):
-                    prob = model.predict_proba(X_test)[:, 1]
-                    y_score.extend(
-                        prob.tolist()
-                    )
-
-            y_test = np.array(
-                y_true
+    
+            # ======================================================
+            # Save predictions
+            # ======================================================
+            prediction_df = pd.DataFrame({
+                "Sample": dataset.iloc[test_idx]["Sample"].values,
+    
+                "GroundTruth": y_test.values,
+    
+                "Prediction": y_pred
+            })
+    
+            prediction_df.to_csv(
+                folder / "predictions.csv",
+                index=False
             )
-            y_pred = np.array(
-                y_pred
-            )
-            if len(y_score) > 0:
-                y_score = np.array(
-                    y_score
-                )
-            else:
-                y_score = None
-
-        runtime = time.time() - start
-
-        print(f"Runtime : {runtime:.3f} s")
-
-        self.save_prediction(folder, sample_test, y_test, y_pred, y_score)
-
-        self.save_model(folder, model)
-
-        result = {
-            "Method": data["dataset"]["Method"].iloc[0],
-            "Model": model_name,
-            "Runtime": runtime,
-            "ModelObject": model,
-            "Folder": folder,
-            "FeatureNames": feature_names,
-            "Sample": sample_test,
-            "GroundTruth": y_test,
-            "Prediction": y_pred,
-            "Probability": y_score
-        }
-
-        return result
+    
+            # ======================================================
+            # Result
+            # ======================================================
+            return {
+                "Model": model_name,
+                "Folder": folder,
+                "GroundTruth": y_test.values,
+                "Prediction": y_pred,
+                "Probability": y_score,
+                "Runtime(s)": runtime,
+                "ModelObject": model,
+                "FeatureNames": data["feature_names"]
+            }
 
     # ======================================================
     # Train All Models
@@ -406,11 +417,7 @@ class ClassificationPipeline:
         results = []
         models = self.get_models()
         for model_name, model in models.items():
-            result = self.train_one_model(
-                model_name,
-                model,
-                data
-            )
+            result = self.train_one_model(model_name, data)
             results.append(result)
         return results
 
@@ -423,56 +430,48 @@ class ClassificationPipeline:
         print(f"CLASSIFICATION : {method.upper()}")
         print("=" * 70)
 
-        # ------------------------------------------
-        # Load dataset
-        # ------------------------------------------
+        # ======================================================
+        # Load
+        # ======================================================
         dataset = self.load_dataset(method)
-        out_dir = self.save_dataset(
-            method,
-            dataset
-        )
+        out_dir = self.save_dataset(method,dataset)
         self.dataset_information(dataset)
 
-        # ------------------------------------------
-        # Prepare data
-        # ------------------------------------------
-        X, y, feature_names, scaler = self.prepare_data(dataset)
-        cv = self.create_cv(
-            X,
-            y
-        )
-        split = self.split_dataset(
-            X,
-            y
-        )
+        # ======================================================
+        # Prepare
+        # ======================================================
+        X, y, feature_names = self.prepare_data(dataset)
 
-        # ------------------------------------------
-        # Create data dictionary
-        # ------------------------------------------
+        # ======================================================
+        # Leakage-safe split
+        # ======================================================
+        train_idx, test_idx = self.blocked_split(dataset)
+
+        # ======================================================
+        # Data
+        # ======================================================
         data = {
             "dataset": dataset,
             "X": X,
             "y": y,
             "feature_names": feature_names,
-            "scaler": scaler,
-            "cv": cv,
-            "split": split,
+            "train_idx": train_idx,
+            "test_idx": test_idx,
             "out_dir": out_dir
         }
 
-        # ------------------------------------------
-        # Train all models
-        # ------------------------------------------
+        # ======================================================
+        # Train
+        # ======================================================
         results = self.train_all_models(data)
+
+        # ======================================================
+        # Evaluate
+        # ======================================================
         results = self.evaluate_all_models(results)
         self.plot_results(results)
-
         self.plot_feature_importance(results)
-
-        summary = self.save_summary(
-            method,
-            results
-        )
+        summary = self.save_summary(method, results)
 
         return summary
 
@@ -547,12 +546,8 @@ class ClassificationPipeline:
     def evaluate_all_models(self, results):
         evaluation = []
         for result in results:
-            result = self.evaluate_one_model(
-                result
-            )
-            evaluation.append(
-                result
-            )
+            result = self.evaluate_one_model(result)
+            evaluation.append(result)
         return evaluation
 
     # ======================================================
@@ -648,7 +643,6 @@ class ClassificationPipeline:
             rows.append({
                 "Method": method,
                 "Model": result["Model"],
-                "Runtime(s)": result["Runtime"],
                 "Accuracy": result["Accuracy"],
                 "Precision": result["Precision"],
                 "Recall": result["Recall"],
