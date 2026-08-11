@@ -3,57 +3,57 @@ MEDIAN - STATIC
 ============================================================
 
 amp_mean                      : 
-Threshold                     : 0.485
-Activity Ratio                : 17.2543
-Motion Duration               : 59.7
-Peak Count                    : 27
-Peak Height                   : 0.674
-Score Mean                    : 0.2621
-Score STD                     : 0.2229
+Threshold                     : 0.213
+Activity Ratio                : 11.4989
+Motion Duration               : 64.9
+Peak Count                    : 32
+Peak Height                   : 0.301
+Score Mean                    : 0.1143
+Score STD                     : 0.0987
 
 amp_std                       : 
-Threshold                     : 0.3803
-Activity Ratio                : 16.1561
-Motion Duration               : 55.9
-Peak Count                    : 26
-Peak Height                   : 0.5303
-Score Mean                    : 0.2086
-Score STD                     : 0.1717
+Threshold                     : 0.3882
+Activity Ratio                : 15.6804
+Motion Duration               : 88.5
+Peak Count                    : 33
+Peak Height                   : 0.599
+Score Mean                    : 0.2014
+Score STD                     : 0.1868
 
 amp_max                       : 
-Threshold                     : 0.4728
-Activity Ratio                : 16.7052
-Motion Duration               : 57.8
-Peak Count                    : 29
-Peak Height                   : 0.6479
-Score Mean                    : 0.2593
-Score STD                     : 0.2135
+Threshold                     : 0.3188
+Activity Ratio                : 14.2629
+Motion Duration               : 80.5
+Peak Count                    : 35
+Peak Height                   : 0.4603
+Score Mean                    : 0.1711
+Score STD                     : 0.1477
 
 phase_std                     : 
-Threshold                     : 0.4889
-Activity Ratio                : 16.4162
-Motion Duration               : 56.8
-Peak Count                    : 26
-Peak Height                   : 0.6604
-Score Mean                    : 0.2866
-Score STD                     : 0.2023
+Threshold                     : 0.1837
+Activity Ratio                : 9.6386
+Motion Duration               : 54.4
+Peak Count                    : 20
+Peak Height                   : 0.3913
+Score Mean                    : 0.0667
+Score STD                     : 0.117
 
 i_mean                        : 
-Threshold                     : 0.4467
-Activity Ratio                : 15.6069
-Motion Duration               : 54.0
-Peak Count                    : 27
-Peak Height                   : 0.6049
-Score Mean                    : 0.2612
-Score STD                     : 0.1854
+Threshold                     : 0.3622
+Activity Ratio                : 16.017
+Motion Duration               : 90.4
+Peak Count                    : 50
+Peak Height                   : 0.4716
+Score Mean                    : 0.2067
+Score STD                     : 0.1554
 
 q_mean                        : 
-Threshold                     : 0.4736
-Activity Ratio                : 16.2428
-Motion Duration               : 56.2
-Peak Count                    : 26
-Peak Height                   : 0.6831
-Score Mean                    : 0.2545
-Score STD                     : 0.2192
+Threshold                     : 0.431
+Activity Ratio                : 14.8476
+Motion Duration               : 83.8
+Peak Count                    : 49
+Peak Height                   : 0.5722
+Score Mean                    : 0.2455
+Score STD                     : 0.1856
 
-Runtime(s)                    : 0.0099
+Runtime(s)                    : 0.0043

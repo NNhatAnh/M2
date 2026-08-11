@@ -15,6 +15,6 @@ i_mean MAE                    : nan
 q_mean RMSE                   : nan
 q_mean MAE                    : nan
 
-Sampling Frequency            : 97.425
-Packet Jitter                 : 0.054289
+Sampling Frequency            : 142.619
+Packet Jitter                 : 0.045124
 PSI                           : 0

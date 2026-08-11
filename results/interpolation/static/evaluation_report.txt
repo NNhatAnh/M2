@@ -2,19 +2,19 @@
 STATIC INTERPOLATION
 ============================================================
 
-amp_mean RMSE                 : 54.210663
-amp_mean MAE                  : 19.721831
-amp_std RMSE                  : 66.00304
-amp_std MAE                   : 10.471069
-amp_max RMSE                  : 103.939427
-amp_max MAE                   : 39.37164
-phase_std RMSE                : 13.911122
-phase_std MAE                 : 2.332346
-i_mean RMSE                   : 42.888671
-i_mean MAE                    : 22.24598
-q_mean RMSE                   : 53.300615
-q_mean MAE                    : 22.763842
+amp_mean RMSE                 : nan
+amp_mean MAE                  : nan
+amp_std RMSE                  : nan
+amp_std MAE                   : nan
+amp_max RMSE                  : nan
+amp_max MAE                   : nan
+phase_std RMSE                : nan
+phase_std MAE                 : nan
+i_mean RMSE                   : nan
+i_mean MAE                    : nan
+q_mean RMSE                   : nan
+q_mean MAE                    : nan
 
-Sampling Frequency            : 94.877
-Packet Jitter                 : 0.035282
+Sampling Frequency            : 131.493
+Packet Jitter                 : 0.029801
 PSI                           : 0
