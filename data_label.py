@@ -3,7 +3,7 @@ import glob
 import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks
-from config import CSV_SEPARATOR
+from config import *
 
 # ==========================
 # CONFIG
@@ -71,6 +71,10 @@ result["SuggestedLabel"] = np.where(
     0
 )
 
+label_counts = result["SuggestedLabel"].value_counts()
+static_count = int(label_counts.get(0, 0))
+motion_count = int(label_counts.get(1, 0))
+
 result = result.sort_values(
     "MotionScore",
     ascending=False
@@ -84,5 +88,9 @@ result.to_csv(
 
 print()
 print(result)
+
+print("\nSuggested label counts:")
+print(f"  Static (0): {static_count}")
+print(f"  Motion (1): {motion_count}")
 
 print(f"\nSaved to {OUTPUT}")
