@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # =========================================================
 # PROJECT PATH
@@ -15,6 +16,12 @@ DATA_DIR = ROOT_DIR / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 FEATURE_DATA_DIR = DATA_DIR / "features"
+
+# =========================================================
+# CLASSIFICATION CROSS VALIDATION
+# =========================================================
+N_BLOCKED_FOLDS = 5
+PURGE_WINDOWS = 1
 
 # =========================================================
 # RESULT PATH
@@ -51,64 +58,30 @@ for folder in ALL_DIRS:
 # =========================================================
 # DATASET
 # =========================================================
+RAW_CSV_FILES = sorted(
+    (path for path in RAW_DATA_DIR.iterdir() if path.is_file() and path.suffix.lower() == ".csv"),
+    key=lambda path: path.name.lower(),
+)
+
 DATASETS = {
-    "static": [
-        RAW_DATA_DIR / "csi_log.csv",
-        RAW_DATA_DIR / "csi_log (1).csv",
-        RAW_DATA_DIR / "csi_log (2).csv",
-        RAW_DATA_DIR / "csi_log (3).csv",
-        RAW_DATA_DIR / "csi_log (4).csv",
-        RAW_DATA_DIR / "csi_log (5).csv",
-        RAW_DATA_DIR / "csi_log (6).csv",
-        RAW_DATA_DIR / "csi_log (7).csv",
-        RAW_DATA_DIR / "csi_log (8).csv",
-        RAW_DATA_DIR / "csi_log (9).csv",
-        RAW_DATA_DIR / "csi_log (10).csv",
-        RAW_DATA_DIR / "csi_log (11).csv",
-        RAW_DATA_DIR / "csi_log (12).csv",
-        RAW_DATA_DIR / "csi_log (13).csv",
-        RAW_DATA_DIR / "csi_log (14).csv",
-        RAW_DATA_DIR / "csi_log (15).csv",
-        RAW_DATA_DIR / "csi_log (16).csv",
-        RAW_DATA_DIR / "csi_log (17).csv",
-        RAW_DATA_DIR / "csi_log (18).csv"
-    ],
-    "motion": [
-        RAW_DATA_DIR / "csi_log1.csv",
-        RAW_DATA_DIR / "csi_log1 (1).csv",
-        RAW_DATA_DIR / "csi_log1 (2).csv",
-        RAW_DATA_DIR / "csi_log1 (3).csv",
-        RAW_DATA_DIR / "csi_log1 (4).csv",
-        RAW_DATA_DIR / "csi_log1 (5).csv",
-        RAW_DATA_DIR / "csi_log1 (6).csv",
-        RAW_DATA_DIR / "csi_log1 (7).csv",
-        RAW_DATA_DIR / "csi_log1 (8).csv",
-        RAW_DATA_DIR / "csi_log1 (9).csv",
-        RAW_DATA_DIR / "csi_log1 (10).csv",
-        RAW_DATA_DIR / "csi_log1 (11).csv",
-        RAW_DATA_DIR / "csi_log1 (12).csv",
-        RAW_DATA_DIR / "csi_log1 (13).csv",
-        RAW_DATA_DIR / "csi_log1 (14).csv"
-    ]
+    "static": [path for path in RAW_CSV_FILES if not path.stem.lower().startswith("csi_log1")],
+    "motion": [path for path in RAW_CSV_FILES if path.stem.lower().startswith("csi_log1")],
 }
+
+for key, value in DATASETS.items():
+    count = len(value)
+    print(f"{key}: {count}")
 
 # ==========================================================
 # FEATURE SELECTION
 # ==========================================================
 SELECTED_FEATURES = [
-    "Median",
     "STD",
     "RMS",
-    "IQR",
-    "Skewness",
-    "Kurtosis",
     "Energy",
     "PeakCount",
-    "PeakHeight",
-    "ActivityRatio",
-    "FFTEnergy",
-    "SpectralEntropy",
-    "Bandwidth"
+    "PeakProminence",
+    "FFTEnergy"
 ]
 
 # =========================================================
