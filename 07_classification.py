@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import (
@@ -131,33 +132,23 @@ class ClassificationPipeline:
 
         return X, y, feature_names
 
-    def blocked_split(self, dataset):
-        test_indices = []
-        train_indices = []
-
-        purge = max(
-            1,
-            int(
-                np.ceil(
-                    WINDOW_OVERLAP / (1 - WINDOW_OVERLAP)
-                )
-            )
-        )
-
+    def create_blocked_folds(self, dataset):
         print()
         print("=" * 60)
-        print("BLOCKED TEMPORAL SPLIT")
+        print("BLOCKED CROSS VALIDATION")
         print("=" * 60)
         print(
-            f"Test size : {TEST_SIZE * 100:.1f}%"
+            f"Number of folds : {N_BLOCKED_FOLDS}"
         )
         print(
-            f"Purge windows : {purge}"
+            f"Purge windows   : {PURGE_WINDOWS}"
         )
         print()
+
+        class_blocks = {}
 
         # ======================================================
-        # Split separately for STATIC and MOTION
+        # Divide each class into temporal blocks
         # ======================================================
         for label in sorted(dataset["Label"].unique()):
 
@@ -165,60 +156,119 @@ class ClassificationPipeline:
                 dataset["Label"].values == label
             )[0]
 
-            n = len(class_indices)
-
-            if n < 5:
+            if len(class_indices) < N_BLOCKED_FOLDS:
                 raise ValueError(
-                    f"Not enough samples for label {label}: {n}"
+                    f"Label {label} has only "
+                    f"{len(class_indices)} samples."
                 )
 
-            # --------------------------------------------------
-            # Test block = last TEST_SIZE portion
-            # --------------------------------------------------
-            n_test = max(
-                1,
-                int(np.ceil(n * TEST_SIZE))
+            blocks = np.array_split(
+                class_indices,
+                N_BLOCKED_FOLDS
             )
 
-            test_start = n - n_test
-
-            # --------------------------------------------------
-            # Purge samples immediately before test
-            # --------------------------------------------------
-            train_end = max(
-                0,
-                test_start - purge
-            )
-
-            train_class = class_indices[:train_end]
-            test_class = class_indices[test_start:]
-
-            train_indices.extend(
-                train_class.tolist()
-            )
-
-            test_indices.extend(
-                test_class.tolist()
-            )
+            class_blocks[label] = blocks
 
             print(
                 f"Label {label}: "
-                f"Train={len(train_class)}, "
-                f"Test={len(test_class)}, "
-                f"Purged={test_start - train_end}"
+                f"{len(class_indices)} samples -> "
+                f"{[len(x) for x in blocks]}"
             )
 
-        train_indices = np.array(
-            train_indices,
-            dtype=int
-        )
+        # ======================================================
+        # Build folds
+        # ======================================================
+        folds = []
 
-        test_indices = np.array(
-            test_indices,
-            dtype=int
-        )
+        for fold_id in range(N_BLOCKED_FOLDS):
 
-        return train_indices, test_indices
+            train_indices = []
+            test_indices = []
+
+            for label, blocks in class_blocks.items():
+
+                test_block = blocks[fold_id]
+
+                # ------------------------------------------------
+                # TEST
+                # ------------------------------------------------
+                test_indices.extend(
+                    test_block.tolist()
+                )
+
+                # ------------------------------------------------
+                # TRAIN = all other blocks
+                # ------------------------------------------------
+                for block_id, block in enumerate(blocks):
+
+                    if block_id == fold_id:
+                        continue
+
+                    train_indices.extend(
+                        block.tolist()
+                    )
+
+                # ------------------------------------------------
+                # PURGE around test block
+                # ------------------------------------------------
+                class_indices = np.where(
+                    dataset["Label"].values == label
+                )[0]
+
+                test_start_pos = np.where(
+                    class_indices == test_block[0]
+                )[0][0]
+
+                test_end_pos = np.where(
+                    class_indices == test_block[-1]
+                )[0][0]
+
+                purge_start = max(
+                    0,
+                    test_start_pos - PURGE_WINDOWS
+                )
+
+                purge_end = min(
+                    len(class_indices),
+                    test_end_pos + 1 + PURGE_WINDOWS
+                )
+
+                purge_indices = set(
+                    class_indices[
+                        purge_start:purge_end
+                    ].tolist()
+                )
+
+                train_indices = [
+                    idx
+                    for idx in train_indices
+                    if idx not in purge_indices
+                ]
+
+            train_indices = np.array(
+                sorted(set(train_indices)),
+                dtype=int
+            )
+
+            test_indices = np.array(
+                sorted(set(test_indices)),
+                dtype=int
+            )
+
+            folds.append(
+                (
+                    train_indices,
+                    test_indices
+                )
+            )
+
+            print(
+                f"Fold {fold_id + 1}: "
+                f"Train={len(train_indices)}, "
+                f"Test={len(test_indices)}"
+            )
+
+        return folds
 
     # ======================================================
     # Dataset Information
@@ -245,11 +295,10 @@ class ClassificationPipeline:
                 max_iter=1000
             )
         elif model_name == "svm":
-            model = SVC(
+            model = CalibratedClassifierCV(SVC(
                 kernel="rbf",
-                probability=True,
                 random_state=RANDOM_STATE
-            )
+            ), ensemble=False)
         elif model_name == "random_forest":
             model = RandomForestClassifier(
                 n_estimators=300,
@@ -328,97 +377,389 @@ class ClassificationPipeline:
     # Train One Model
     # ======================================================
     def train_one_model(self, model_name, data):
-            X = data["X"]
-            y = data["y"]
-    
-            train_idx = data["train_idx"]
-            test_idx = data["test_idx"]
-    
-            dataset = data["dataset"]
-            out_dir = data["out_dir"]
-    
-            # ======================================================
-            # Create output folder
-            # ======================================================
-            folder = (out_dir/ model_name)
-            folder.mkdir(parents=True,exist_ok=True)
-    
-            # ======================================================
-            # Raw train/test
-            # ======================================================
+        X = data["X"]
+        y = data["y"]
+
+        dataset = data["dataset"]
+
+        feature_names = data["feature_names"]
+        folds = data["folds"]
+        out_dir = data["out_dir"]
+
+        # ======================================================
+        # Output
+        # ======================================================
+        folder = self.create_output_folder(
+            out_dir,
+            model_name
+        )
+
+        print()
+        print("=" * 60)
+        print(
+            f"MODEL : {model_name.upper()}"
+        )
+        print("=" * 60)
+
+        fold_results = []
+
+        all_true = []
+        all_pred = []
+        all_score = []
+        all_samples = []
+
+        feature_importances = []
+
+        total_start = time.perf_counter()
+
+        # ======================================================
+        # FOLD LOOP
+        # ======================================================
+        for fold_id, (train_idx, test_idx) in enumerate(
+            folds,
+            start=1
+        ):
+
+            print()
+            print(
+                f"Fold {fold_id}/{len(folds)}"
+            )
+
             X_train = X.iloc[train_idx]
             X_test = X.iloc[test_idx]
-    
+
             y_train = y.iloc[train_idx]
             y_test = y.iloc[test_idx]
-    
-            # ======================================================
+
+            # ==================================================
             # SCALER
-            # ======================================================
+            # FIT ONLY ON TRAIN
+            # ==================================================
             scaler = StandardScaler()
-    
-            # Fit ONLY on training data
-            X_train = scaler.fit_transform(X_train)
-    
-            # Transform test using training scaler
-            X_test = scaler.transform(X_test)
-    
-            # ======================================================
-            # Model
-            # ======================================================
-            model = self.create_model(model_name)
-            start = time.perf_counter()
-            model.fit(X_train,y_train)
-            y_pred = model.predict(X_test)
-            runtime = (time.perf_counter()- start)
-    
-            # ======================================================
-            # Probability
-            # ======================================================
-            if hasattr(model, "predict_proba"):
-                y_score = model.predict_proba(X_test)[:, 1]
+
+            X_train_scaled = scaler.fit_transform(
+                X_train
+            )
+
+            X_test_scaled = scaler.transform(
+                X_test
+            )
+
+            # ==================================================
+            # NEW MODEL FOR EACH FOLD
+            # ==================================================
+            model = self.create_model(
+                model_name
+            )
+
+            model.fit(
+                X_train_scaled,
+                y_train
+            )
+
+            # ==================================================
+            # Prediction
+            # ==================================================
+            y_pred = model.predict(
+                X_test_scaled
+            )
+
+            if hasattr(
+                model,
+                "predict_proba"
+            ):
+
+                y_score = model.predict_proba(
+                    X_test_scaled
+                )[:, 1]
+
             else:
+
                 y_score = None
-    
-            # ======================================================
-            # Save predictions
-            # ======================================================
-            prediction_df = pd.DataFrame({
-                "Sample": dataset.iloc[test_idx]["Sample"].values,
-    
-                "GroundTruth": y_test.values,
-    
-                "Prediction": y_pred
+
+            # ==================================================
+            # Fold metrics
+            # ==================================================
+            accuracy = accuracy_score(
+                y_test,
+                y_pred
+            )
+
+            precision = precision_score(
+                y_test,
+                y_pred,
+                zero_division=0
+            )
+
+            recall = recall_score(
+                y_test,
+                y_pred,
+                zero_division=0
+            )
+
+            f1 = f1_score(
+                y_test,
+                y_pred,
+                zero_division=0
+            )
+
+            if y_score is not None:
+                auc = roc_auc_score(
+                    y_test,
+                    y_score
+                )
+            else:
+                auc = np.nan
+
+            overall = np.nanmean([
+                accuracy,
+                precision,
+                recall,
+                f1,
+                auc
+            ])
+
+            fold_results.append({
+                "Fold": fold_id,
+                "Accuracy": accuracy,
+                "Precision": precision,
+                "Recall": recall,
+                "F1 Score": f1,
+                "ROC AUC": auc,
+                "Overall Score": overall,
+                "Train Samples": len(train_idx),
+                "Test Samples": len(test_idx)
             })
-    
-            prediction_df.to_csv(
-                folder / "predictions.csv",
+
+            print(
+                f"  Accuracy  : {accuracy:.4f}"
+            )
+            print(
+                f"  Precision : {precision:.4f}"
+            )
+            print(
+                f"  Recall    : {recall:.4f}"
+            )
+            print(
+                f"  F1        : {f1:.4f}"
+            )
+            print(
+                f"  ROC AUC   : {auc:.4f}"
+            )
+
+            # ==================================================
+            # OOF predictions
+            # ==================================================
+            all_true.extend(
+                y_test.tolist()
+            )
+
+            all_pred.extend(
+                y_pred.tolist()
+            )
+
+            all_samples.extend(
+                dataset.iloc[test_idx]["Sample"].tolist()
+            )
+
+            if y_score is not None:
+                all_score.extend(
+                    y_score.tolist()
+                )
+
+            # ==================================================
+            # Random Forest importance
+            # ==================================================
+            if (
+                model_name == "random_forest"
+                and hasattr(
+                    model,
+                    "feature_importances_"
+                )
+            ):
+
+                feature_importances.append(
+                    model.feature_importances_
+                )
+
+        # ======================================================
+        # Runtime
+        # ======================================================
+        runtime = (
+            time.perf_counter()
+            - total_start
+        )
+
+        fold_df = pd.DataFrame(
+            fold_results
+        )
+
+        # ======================================================
+        # Mean / STD
+        # ======================================================
+        metric_columns = [
+            "Accuracy",
+            "Precision",
+            "Recall",
+            "F1 Score",
+            "ROC AUC",
+            "Overall Score"
+        ]
+
+        means = fold_df[
+            metric_columns
+        ].mean()
+
+        stds = fold_df[
+            metric_columns
+        ].std(
+            ddof=1
+        )
+
+        # ======================================================
+        # OOF arrays
+        # ======================================================
+        all_true = np.asarray(
+            all_true
+        )
+
+        all_pred = np.asarray(
+            all_pred
+        )
+
+        if all_score:
+            all_score = np.asarray(
+                all_score
+            )
+        else:
+            all_score = None
+
+        # ======================================================
+        # Save fold results
+        # ======================================================
+        fold_df.to_csv(
+            folder / "fold_results.csv",
+            index=False
+        )
+
+        # ======================================================
+        # Save OOF predictions
+        # ======================================================
+        self.save_prediction(
+            folder,
+            all_samples,
+            all_true,
+            all_pred,
+            all_score
+        )
+
+        # ======================================================
+        # Average RF feature importance
+        # ======================================================
+        if feature_importances:
+
+            mean_importance = np.mean(
+                feature_importances,
+                axis=0
+            )
+
+            importance = pd.DataFrame({
+                "Feature": feature_names,
+                "Importance": mean_importance
+            })
+
+            importance = importance.sort_values(
+                "Importance",
+                ascending=False
+            )
+
+            importance.to_csv(
+                folder / "feature_importance.csv",
                 index=False
             )
-    
-            # ======================================================
-            # Result
-            # ======================================================
-            return {
-                "Model": model_name,
-                "Folder": folder,
-                "GroundTruth": y_test.values,
-                "Prediction": y_pred,
-                "Probability": y_score,
-                "Runtime(s)": runtime,
-                "ModelObject": model,
-                "FeatureNames": data["feature_names"]
-            }
+
+        # ======================================================
+        # Result
+        # ======================================================
+        return {
+
+            "Method":
+                dataset["Method"].iloc[0],
+
+            "Model":
+                model_name,
+
+            "Runtime":
+                runtime,
+
+            "Folder":
+                folder,
+
+            "FeatureNames":
+                feature_names,
+
+            "GroundTruth":
+                all_true,
+
+            "Prediction":
+                all_pred,
+
+            "Probability":
+                all_score,
+
+            "FoldResults":
+                fold_df,
+
+            "Accuracy":
+                means["Accuracy"],
+
+            "Precision":
+                means["Precision"],
+
+            "Recall":
+                means["Recall"],
+
+            "F1":
+                means["F1 Score"],
+
+            "AUC":
+                means["ROC AUC"],
+
+            "Overall Score":
+                means["Overall Score"],
+
+            "Accuracy STD":
+                stds["Accuracy"],
+
+            "Precision STD":
+                stds["Precision"],
+
+            "Recall STD":
+                stds["Recall"],
+
+            "F1 STD":
+                stds["F1 Score"],
+
+            "AUC STD":
+                stds["ROC AUC"]
+        }
 
     # ======================================================
     # Train All Models
     # ======================================================
     def train_all_models(self, data):
         results = []
-        models = self.get_models()
-        for model_name, model in models.items():
-            result = self.train_one_model(model_name, data)
-            results.append(result)
+
+        for model_name in MODELS:
+            result = self.train_one_model(
+                model_name,
+                data
+            )
+
+            results.append(
+                result
+            )
+
         return results
 
     # ======================================================
@@ -434,7 +775,7 @@ class ClassificationPipeline:
         # Load
         # ======================================================
         dataset = self.load_dataset(method)
-        out_dir = self.save_dataset(method,dataset)
+        out_dir = self.save_dataset(method, dataset)
         self.dataset_information(dataset)
 
         # ======================================================
@@ -445,7 +786,7 @@ class ClassificationPipeline:
         # ======================================================
         # Leakage-safe split
         # ======================================================
-        train_idx, test_idx = self.blocked_split(dataset)
+        folds = self.create_blocked_folds(dataset)
 
         # ======================================================
         # Data
@@ -455,8 +796,7 @@ class ClassificationPipeline:
             "X": X,
             "y": y,
             "feature_names": feature_names,
-            "train_idx": train_idx,
-            "test_idx": test_idx,
+            "folds": folds,
             "out_dir": out_dir
         }
 
@@ -484,38 +824,12 @@ class ClassificationPipeline:
         y_score = result["Probability"]
 
         folder = result["Folder"]
-        print()
-        print("=" * 60)
-        print(f"EVALUATION : {result['Model'].upper()}")
-        print("=" * 60)
 
-        accuracy = accuracy_score(y_true, y_pred)
-        precision = precision_score(
-            y_true,
-            y_pred,
-            zero_division=0
-        )
-        recall = recall_score(
-            y_true,
-            y_pred,
-            zero_division=0
-        )
-        f1 = f1_score(
-            y_true,
-            y_pred,
-            zero_division=0
-        )
-        if y_score is not None:
-            auc = roc_auc_score(
-                y_true,
-                y_score
-            )
-        else:
-            auc = np.nan
         cm = confusion_matrix(
             y_true,
             y_pred
         )
+
         report = classification_report(
             y_true,
             y_pred,
@@ -523,21 +837,87 @@ class ClassificationPipeline:
             zero_division=0
         )
 
-        print(f"Accuracy  : {accuracy:.4f}")
-        print(f"Precision : {precision:.4f}")
-        print(f"Recall    : {recall:.4f}")
-        print(f"F1 Score  : {f1:.4f}")
-        print(f"ROC AUC   : {auc:.4f}")
+        print()
+        print("=" * 60)
+        print(
+            f"EVALUATION : "
+            f"{result['Model'].upper()}"
+        )
+        print("=" * 60)
+
+        print(
+            f"Accuracy  : "
+            f"{result['Accuracy']:.4f} "
+            f"± {result['Accuracy STD']:.4f}"
+        )
+
+        print(
+            f"Precision : "
+            f"{result['Precision']:.4f} "
+            f"± {result['Precision STD']:.4f}"
+        )
+
+        print(
+            f"Recall    : "
+            f"{result['Recall']:.4f} "
+            f"± {result['Recall STD']:.4f}"
+        )
+
+        print(
+            f"F1 Score  : "
+            f"{result['F1']:.4f} "
+            f"± {result['F1 STD']:.4f}"
+        )
+
+        print(
+            f"ROC AUC   : "
+            f"{result['AUC']:.4f} "
+            f"± {result['AUC STD']:.4f}"
+        )
+
         print()
         print(report)
-        with open(folder / "classification_report.txt", "w") as f:
+
+        with open(
+            folder / "classification_report.txt",
+            "w"
+        ) as f:
+
             f.write(report)
-        result["Accuracy"] = accuracy
-        result["Precision"] = precision
-        result["Recall"] = recall
-        result["F1"] = f1
-        result["AUC"] = auc
+
+            f.write("\n\n")
+            f.write(
+                f"Accuracy Mean ± STD: "
+                f"{result['Accuracy']:.6f} ± "
+                f"{result['Accuracy STD']:.6f}\n"
+            )
+
+            f.write(
+                f"Precision Mean ± STD: "
+                f"{result['Precision']:.6f} ± "
+                f"{result['Precision STD']:.6f}\n"
+            )
+
+            f.write(
+                f"Recall Mean ± STD: "
+                f"{result['Recall']:.6f} ± "
+                f"{result['Recall STD']:.6f}\n"
+            )
+
+            f.write(
+                f"F1 Mean ± STD: "
+                f"{result['F1']:.6f} ± "
+                f"{result['F1 STD']:.6f}\n"
+            )
+
+            f.write(
+                f"ROC AUC Mean ± STD: "
+                f"{result['AUC']:.6f} ± "
+                f"{result['AUC STD']:.6f}\n"
+            )
+
         result["ConfusionMatrix"] = cm
+
         return result
 
     # ======================================================
@@ -638,34 +1018,53 @@ class ClassificationPipeline:
         rows = []
 
         for result in results:
-            overall = (result["Accuracy"] + result["Precision"] +
-                       result["Recall"] + result["F1"]) / 4
             rows.append({
                 "Method": method,
                 "Model": result["Model"],
+                "Runtime(s)": result["Runtime"],
+
                 "Accuracy": result["Accuracy"],
+                "Accuracy STD": result["Accuracy STD"],
+
                 "Precision": result["Precision"],
+                "Precision STD": result["Precision STD"],
+
                 "Recall": result["Recall"],
+                "Recall STD": result["Recall STD"],
+
                 "F1 Score": result["F1"],
+                "F1 STD": result["F1 STD"],
+
                 "ROC AUC": result["AUC"],
-                "Overall Score": overall
+                "ROC AUC STD": result["AUC STD"],
+
+                "Overall Score":
+                    result["Overall Score"]
             })
 
         summary = pd.DataFrame(rows)
-        folder = CLASSIFICATION_DIR / method
+
         summary = summary.sort_values(
             "Overall Score",
             ascending=False
         ).reset_index(drop=True)
 
+        folder = CLASSIFICATION_DIR / method
+
         summary.to_csv(
             folder / "summary.csv",
             index=False
         )
+
         print()
-        print("="*60)
+        print("=" * 60)
+        print(
+            f"{method.upper()} SUMMARY"
+        )
+        print("=" * 60)
         print(summary)
-        print("="*60)
+        print("=" * 60)
+
         return summary
 
     # ======================================================
@@ -702,40 +1101,58 @@ class ClassificationPipeline:
     # ======================================================
     # Feature Importance
     # ======================================================
-    def feature_importance(
-        self,
-        result
-    ):
+    def feature_importance(self, result):
         if result["Model"] != "random_forest":
             return
-        model = result["ModelObject"]
+
         folder = result["Folder"]
-        feature_names = result["FeatureNames"]
-        importance = pd.DataFrame({
-            "Feature": feature_names,
-            "Importance": model.feature_importances_
-        })
+
+        importance_file = (
+            folder / "feature_importance.csv"
+        )
+
+        if not importance_file.exists():
+            print(
+                f"Feature importance file not found: "
+                f"{importance_file}"
+            )
+            return
+
+        importance = pd.read_csv(
+            importance_file
+        )
+
         importance = importance.sort_values(
             "Importance",
             ascending=False
         )
-        importance.to_csv(
-            folder / "feature_importance.csv",
-            index=False
-        )
+
+        # ======================================================
+        # Save top 20
+        # ======================================================
+        top20 = importance.head(20)
+
         plt.figure(figsize=(8, 8))
+
         plt.barh(
-            importance["Feature"][:20],
-            importance["Importance"][:20]
+            top20["Feature"][::-1],
+            top20["Importance"][::-1]
         )
-        plt.gca().invert_yaxis()
-        plt.xlabel("Importance")
-        plt.title("Top 20 Feature Importance")
+
+        plt.xlabel("Mean Feature Importance")
+        plt.ylabel("Feature")
+
+        plt.title(
+            "Top 20 Feature Importance - Random Forest"
+        )
+
         plt.tight_layout()
+
         plt.savefig(
             folder / "feature_importance.png",
             dpi=300
         )
+
         plt.close()
 
     # ======================================================
