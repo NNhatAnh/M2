@@ -258,22 +258,6 @@ class MotionPipeline:
             report.blank()
 
         # ==================================================
-        # Runtime
-        # ==================================================
-        runtime = (
-            time.perf_counter()
-            -
-            start
-        )
-        report.add(
-            "Runtime(s)",
-            round(
-                runtime,
-                4
-            )
-        )
-
-        # ==================================================
         # Save CSV
         # ==================================================
         score_file = (
@@ -378,7 +362,6 @@ class MotionPipeline:
         self.summary.append({
             "Method": method,
             "Dataset": dataset_name,
-            "Runtime(s)": runtime,
             "Mean Activity Ratio": summary["Activity Ratio"].mean(),
             "Mean Motion Duration": summary["Motion Duration"].mean(),
             "Mean Peak Count": summary["Peak Count"].mean(),

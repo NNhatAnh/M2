@@ -28,7 +28,7 @@ phase_std STD Reduction (%)   : 32.948
 phase_std Correlation         : 0.727597
 phase_std Energy Preservation (%): 47.59
 phase_std Smoothness Gain (%) : 67.293
-phase_std Runtime (ms)        : 0.0001
+phase_std Runtime (ms)        : 0.0
 
 i_mean Variance Reduction (%) : 57.337
 i_mean STD Reduction (%)      : 34.683

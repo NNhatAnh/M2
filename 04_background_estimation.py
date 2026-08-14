@@ -143,11 +143,6 @@ class BackgroundPipeline:
             report.add("Motion Energy", round(motion_energy, 2))
             report.add("Correlation", round(correlation, 4))
             report.blank()
-        runtime = (
-            time.perf_counter()
-            - start_time
-        )
-        report.add("Runtime(s)", round(runtime, 4))
 
         # ==================================================
         # Save CSV
@@ -218,7 +213,6 @@ class BackgroundPipeline:
         # ==================================================
         self.summary.append({
             "Dataset": dataset_name,
-            "Runtime(s)": runtime,
             "Mean Background STD": summary_df["Background STD"].mean(),
             "Mean Motion STD": summary_df["Motion STD"].mean(),
             "Mean Correlation": summary_df["Correlation"].mean(),

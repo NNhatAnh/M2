@@ -1,15 +1,11 @@
               precision    recall  f1-score   support
 
-           0     0.5556    0.5814    0.5682        43
-           1     0.6897    0.6667    0.6780        60
+           0     0.6696    0.6875    0.6784       224
+           1     0.7727    0.7580    0.7653       314
 
-    accuracy                         0.6311       103
-   macro avg     0.6226    0.6240    0.6231       103
-weighted avg     0.6337    0.6311    0.6321       103
+    accuracy                         0.7286       538
+   macro avg     0.7211    0.7227    0.7218       538
+weighted avg     0.7298    0.7286    0.7291       538
 
 
-Accuracy Mean ± STD: 0.633810 ± 0.208903
-Precision Mean ± STD: 0.755882 ± 0.242892
-Recall Mean ± STD: 0.666667 ± 0.220479
-F1 Mean ± STD: 0.673135 ± 0.185121
-ROC AUC Mean ± STD: 0.691667 ± 0.253732
+Accuracy Mean ± STD: 0.728686 ± Precision Mean ± STD: 0.804409 ± Recall Mean ± STD: 0.757450 ± F1 Mean ± STD: 0.768789 ± ROC AUC Mean ± STD: 0.750032 ± 

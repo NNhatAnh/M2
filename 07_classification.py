@@ -582,14 +582,6 @@ class ClassificationPipeline:
                     model.feature_importances_
                 )
 
-        # ======================================================
-        # Runtime
-        # ======================================================
-        runtime = (
-            time.perf_counter()
-            - total_start
-        )
-
         fold_df = pd.DataFrame(
             fold_results
         )
@@ -609,12 +601,6 @@ class ClassificationPipeline:
         means = fold_df[
             metric_columns
         ].mean()
-
-        stds = fold_df[
-            metric_columns
-        ].std(
-            ddof=1
-        )
 
         # ======================================================
         # OOF arrays
@@ -689,9 +675,6 @@ class ClassificationPipeline:
             "Model":
                 model_name,
 
-            "Runtime":
-                runtime,
-
             "Folder":
                 folder,
 
@@ -726,22 +709,7 @@ class ClassificationPipeline:
                 means["ROC AUC"],
 
             "Overall Score":
-                means["Overall Score"],
-
-            "Accuracy STD":
-                stds["Accuracy"],
-
-            "Precision STD":
-                stds["Precision"],
-
-            "Recall STD":
-                stds["Recall"],
-
-            "F1 STD":
-                stds["F1 Score"],
-
-            "AUC STD":
-                stds["ROC AUC"]
+                means["Overall Score"]
         }
 
     # ======================================================
@@ -848,31 +816,26 @@ class ClassificationPipeline:
         print(
             f"Accuracy  : "
             f"{result['Accuracy']:.4f} "
-            f"± {result['Accuracy STD']:.4f}"
         )
 
         print(
             f"Precision : "
             f"{result['Precision']:.4f} "
-            f"± {result['Precision STD']:.4f}"
         )
 
         print(
             f"Recall    : "
             f"{result['Recall']:.4f} "
-            f"± {result['Recall STD']:.4f}"
         )
 
         print(
             f"F1 Score  : "
             f"{result['F1']:.4f} "
-            f"± {result['F1 STD']:.4f}"
         )
 
         print(
             f"ROC AUC   : "
             f"{result['AUC']:.4f} "
-            f"± {result['AUC STD']:.4f}"
         )
 
         print()
@@ -889,31 +852,26 @@ class ClassificationPipeline:
             f.write(
                 f"Accuracy Mean ± STD: "
                 f"{result['Accuracy']:.6f} ± "
-                f"{result['Accuracy STD']:.6f}\n"
             )
 
             f.write(
                 f"Precision Mean ± STD: "
                 f"{result['Precision']:.6f} ± "
-                f"{result['Precision STD']:.6f}\n"
             )
 
             f.write(
                 f"Recall Mean ± STD: "
                 f"{result['Recall']:.6f} ± "
-                f"{result['Recall STD']:.6f}\n"
             )
 
             f.write(
                 f"F1 Mean ± STD: "
                 f"{result['F1']:.6f} ± "
-                f"{result['F1 STD']:.6f}\n"
             )
 
             f.write(
                 f"ROC AUC Mean ± STD: "
                 f"{result['AUC']:.6f} ± "
-                f"{result['AUC STD']:.6f}\n"
             )
 
         result["ConfusionMatrix"] = cm
@@ -1021,22 +979,16 @@ class ClassificationPipeline:
             rows.append({
                 "Method": method,
                 "Model": result["Model"],
-                "Runtime(s)": result["Runtime"],
 
                 "Accuracy": result["Accuracy"],
-                "Accuracy STD": result["Accuracy STD"],
 
                 "Precision": result["Precision"],
-                "Precision STD": result["Precision STD"],
 
                 "Recall": result["Recall"],
-                "Recall STD": result["Recall STD"],
 
                 "F1 Score": result["F1"],
-                "F1 STD": result["F1 STD"],
 
                 "ROC AUC": result["AUC"],
-                "ROC AUC STD": result["AUC STD"],
 
                 "Overall Score":
                     result["Overall Score"]

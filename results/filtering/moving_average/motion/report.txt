@@ -35,7 +35,7 @@ i_mean STD Reduction (%)      : 35.066
 i_mean Correlation            : 0.736479
 i_mean Energy Preservation (%): 42.272
 i_mean Smoothness Gain (%)    : 72.741
-i_mean Runtime (ms)           : 0.0
+i_mean Runtime (ms)           : 0.0001
 
 q_mean Variance Reduction (%) : 63.661
 q_mean STD Reduction (%)      : 39.718

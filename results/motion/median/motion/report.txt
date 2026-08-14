@@ -56,4 +56,3 @@ Peak Height                   : 0.54
 Score Mean                    : 0.0549
 Score STD                     : 0.1089
 
-Runtime(s)                    : 0.0046

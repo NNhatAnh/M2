@@ -107,7 +107,7 @@ FEATURE_COLUMNS = [
 # ==========================================================
 # Sliding Window
 # ==========================================================
-WINDOW_SIZE = 256
+WINDOW_SIZE = 50
 WINDOW_OVERLAP = 0.5
 STEP_SIZE = int(WINDOW_SIZE * (1 - WINDOW_OVERLAP))
 

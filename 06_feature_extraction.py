@@ -267,17 +267,6 @@ class FeaturePipeline:
         vector_df = pd.DataFrame(feature_vectors)
 
         vector_df.to_csv(output_folder / "feature_vector.csv", index=False)
-        runtime = (
-            time.perf_counter() - start
-        )
-
-        report.add(
-            "Runtime(s)",
-            round(
-                runtime,
-                4
-            )
-        )
 
         # ==================================================
         # Save CSV
@@ -372,7 +361,6 @@ class FeaturePipeline:
         benchmark_row = {
             "Method": method,
             "Dataset": dataset,
-            "Runtime(s)": runtime,
             "Mean STD": feature_df["STD"].mean(),
             "Mean RMS": feature_df["RMS"].mean(),
             "Mean Energy": feature_df["Energy"].mean(),
