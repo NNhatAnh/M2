@@ -381,21 +381,296 @@ class FeaturePipeline:
         print(f"Output : {output_folder}")
         print()
 
+    # ==========================================================
+    # Filter Comparison Visualization
+    # ==========================================================
+    def plot_filter_comparison(self, dataset):
+        """
+        Compare Butterworth, Median and Moving Average
+        for the same recording.
+
+        Rows:
+            1. Time domain
+            2. Frequency domain
+
+        Columns:
+            Butterworth
+            Median
+            Moving Average
+        """
+
+        print()
+        print("=" * 60)
+        print(f"FILTER COMPARISON : {dataset.upper()}")
+        print("=" * 60)
+
+        methods = [
+            "butterworth",
+            "median",
+            "moving_average"
+        ]
+
+        # ------------------------------------------------------
+        # Select one representative signal
+        # ------------------------------------------------------
+
+        plot_feature = "amp_mean"
+
+        data = {}
+
+        for method in methods:
+
+            file = (
+                MOTION_DIR /
+                method /
+                dataset /
+                "motion_score.csv"
+            )
+
+            if not file.exists():
+                print(f"Missing : {file}")
+                continue
+
+            df = pd.read_csv(file)
+
+            if plot_feature not in df.columns:
+                print(
+                    f"{plot_feature} not found in {file}"
+                )
+                continue
+
+            time_data = df[plot_feature].values
+
+            # Remove DC component before FFT
+            x = time_data - np.mean(time_data)
+
+            N = len(x)
+
+            spectrum = np.abs(
+                fft(x)
+            )[:N // 2]
+
+            freq = np.fft.fftfreq(
+                N,
+                d=1 / TARGET_FS
+            )[:N // 2]
+
+            data[method] = {
+                "time": df["time_s"].values,
+                "signal": time_data,
+                "freq": freq,
+                "spectrum": spectrum
+            }
+
+        if len(data) == 0:
+            print("No data available for comparison.")
+            return
+
+        # ------------------------------------------------------
+        # Create figure
+        # ------------------------------------------------------
+
+        fig, axes = plt.subplots(
+            2,
+            3,
+            figsize=(18, 9)
+        )
+
+        method_titles = {
+            "butterworth": "Butterworth",
+            "median": "Median",
+            "moving_average": "Moving Average"
+        }
+
+        # ------------------------------------------------------
+        # Plot
+        # ------------------------------------------------------
+
+        for col, method in enumerate(methods):
+
+            if method not in data:
+                axes[0, col].set_visible(False)
+                axes[1, col].set_visible(False)
+                continue
+
+            d = data[method]
+
+            # ----------------------------------------------
+            # Time domain
+            # ----------------------------------------------
+
+            axes[0, col].plot(
+                d["time"],
+                d["signal"],
+                linewidth=0.8
+            )
+
+            axes[0, col].set_title(
+                method_titles[method]
+            )
+
+            axes[0, col].set_xlabel(
+                "Time (s)"
+            )
+
+            axes[0, col].set_ylabel(
+                "Amplitude"
+            )
+
+            axes[0, col].grid(
+                alpha=0.3
+            )
+
+            # ----------------------------------------------
+            # Frequency domain
+            # ----------------------------------------------
+
+            axes[1, col].plot(
+                d["freq"],
+                d["spectrum"],
+                linewidth=0.8
+            )
+
+            axes[1, col].set_xlabel(
+                "Frequency (Hz)"
+            )
+
+            axes[1, col].set_ylabel(
+                "Magnitude"
+            )
+
+            axes[1, col].grid(
+                alpha=0.3
+            )
+
+        # ------------------------------------------------------
+        # Row titles
+        # ------------------------------------------------------
+
+        fig.text(
+            0.02,
+            0.73,
+            "Time Domain",
+            rotation=90,
+            va="center",
+            fontsize=12,
+            fontweight="bold"
+        )
+
+        fig.text(
+            0.02,
+            0.30,
+            "Frequency Domain",
+            rotation=90,
+            va="center",
+            fontsize=12,
+            fontweight="bold"
+        )
+
+        fig.suptitle(
+            f"Filter Comparison - {dataset.upper()} - {plot_feature}",
+            fontsize=15
+        )
+
+        plt.tight_layout(
+            rect=[0.04, 0.03, 1, 0.95]
+        )
+
+        # ------------------------------------------------------
+        # Save
+        # ------------------------------------------------------
+
+        comparison_folder = (
+            FEATURE_DIR /
+            "filter_comparison"
+        )
+
+        comparison_folder.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        output_file = (
+            comparison_folder /
+            f"{dataset}_comparison.png"
+        )
+
+        plt.savefig(
+            output_file,
+            dpi=300,
+            bbox_inches="tight"
+        )
+
+        print(
+            f"Saved : {output_file}"
+        )
+
+        # ------------------------------------------------------
+        # Display
+        # ------------------------------------------------------
+
+        plt.show()
+        plt.close()
+
     # ======================================================
     # Run
     # ======================================================
     def run(self):
-        print_title("MODULE 06 : FEATURE EXTRACTION")
+
+        print_title(
+            "MODULE 06 : FEATURE EXTRACTION"
+        )
+
+        # ======================================================
+        # Feature Extraction
+        # ======================================================
+
         for method in METHODS:
+
             for dataset in DATASETS.keys():
+
                 self.process(
                     method,
                     dataset
                 )
 
+        # ======================================================
+        # Filter Comparison Visualization
+        # ======================================================
+
+        for dataset in DATASETS.keys():
+
+            self.plot_filter_comparison(
+                dataset
+            )
+
+        # ======================================================
+        # Benchmark
+        # ======================================================
+
         benchmark = pd.DataFrame(
             self.summary
         )
+
+        BENCHMARK_DIR.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        benchmark.to_csv(
+            BENCHMARK_DIR /
+            "feature_benchmark.csv",
+            index=False
+        )
+
+        print("=" * 60)
+        print("FEATURE EXTRACTION BENCHMARK")
+        print("=" * 60)
+        print(benchmark)
+
+        print("=" * 60)
+
+        return benchmark
         BENCHMARK_DIR.mkdir(
             parents=True,
             exist_ok=True
