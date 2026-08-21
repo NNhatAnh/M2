@@ -2,8 +2,8 @@
 STATIC DATASET
 ============================================================
 
-Samples                       : 74203
+Samples                       : 26247
 Duration (s)                  : 564.302
-Sampling Frequency            : 131.493
-Packet Jitter                 : 0.029801
+Sampling Frequency            : 46.511
+Packet Jitter                 : 0.047033
 Packet Stability Index        : 0

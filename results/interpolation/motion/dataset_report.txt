@@ -2,8 +2,8 @@
 MOTION DATASET
 ============================================================
 
-Samples                       : 112447
+Samples                       : 15214
 Duration (s)                  : 788.439
-Sampling Frequency            : 142.619
-Packet Jitter                 : 0.045124
+Sampling Frequency            : 19.295
+Packet Jitter                 : 0.112817
 Packet Stability Index        : 0
